@@ -7,3 +7,21 @@ __pycache__/
 .env
 .venv/
 venv/
+
+# Local futures data and generated research artifacts.
+data/
+work/
+outputs/
+reports/generated/
+*.parquet
+*.feather
+*.h5
+*.pkl
+*.joblib
+*.log
+
+# Keep the tiny committed reference metadata, but never commit rebuilt panels.
+!references/
+!references/futures/
+!references/futures/selected_factors.txt
+!references/futures/factor_catalog.csv

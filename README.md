@@ -1,143 +1,75 @@
-# WQ Alpha Research Skill
+# FU Alpha Research
 
-A self-evolving WorldQuant BRAIN alpha research skill. It helps agents design WQ Alpha expressions, search fields, diagnose simulation failures, check IS metrics, manage self-correlation, and turn each BRAIN interaction into reusable research rules.
+Local China futures alpha mining migrated from the lightweight
+`wq-alpha-research` playbook into a runnable futures research project.
 
-The core idea is simple: do not let alpha research stay as scattered one-off prompts. Use the skill to build alphas, test them, inspect failures, compare daily-return correlations, and then distill the useful lessons back into `SKILL.md`.
+The project is designed for the AutoDL workspace layout:
 
-This repository is a reusable agent skill, not a credential bundle. Keep all account credentials, raw alpha IDs, PnL records, and private candidate expressions local.
+- raw 1-minute futures bars live outside git at `/root/autodl-tmp/quant/data/raw`;
+- intermediate month partitions live outside git at
+  `/root/autodl-tmp/shared-nvme/feature_model/selected_month_parts`;
+- the final rebuilt factor panel, if present, lives outside git at
+  `/root/autodl-tmp/shared-nvme/feature_model/data_factors_big.parquet`;
+- only source code and small reference metadata are committed.
 
-## Why This Skill Exists
+## What This Runs
 
-WQ Alpha mining is not only about writing more expressions. The bottleneck is usually the research loop:
-
-- finding usable fields fast enough;
-- avoiding repeated low-Sharpe templates;
-- controlling turnover before submission;
-- checking SELF_CORRELATION against existing ACTIVE alphas;
-- preserving lessons from failed simulations instead of rediscovering them later.
-
-This skill packages that loop into an agent-readable playbook plus scripts. It gives the agent local field context, practical expression templates, IS failure diagnostics, submission checks, and a self-evolution mechanism for turning new runs into better future behavior.
-
-## Mining Effect
-
-The current playbook is built around USA TOP3000 delay=1 and includes a local snapshot of 4,367 BRAIN data fields. It has already distilled several practical mining rules:
-
-- Fundamental fields are usually the strongest starting point; `group_rank + ts_rank` with `SUBINDUSTRY` neutralization is the default baseline.
-- Analyst expectation fields are useful but need more turnover control, usually via modest decay and industry/subindustry neutralization.
-- Pure technical signals fail more often unless decay is high or they are mixed with slower fundamental signals.
-- Fitness failures are often turnover problems in disguise; decay and signal mixing are the first levers to check.
-- Self-correlation must be measured on daily PnL changes, not cumulative PnL curves.
-- Changing windows, weights, or neutralization rarely creates truly low-correlation alphas by itself; low correlation usually needs a different data source or economic logic.
-
-The goal is not to promise a fixed Sharpe or submission pass rate. The value is a faster, cleaner alpha mining loop: fewer invalid-field attempts, less repeated correlation failure, better default templates, and a growing memory of what worked or failed.
-
-## Self-Evolution Loop
-
-`scripts/evolve_skill.py` is the feedback engine. After simulations, submissions, or status checks, it can fetch the user's alpha list, compare new/changed alphas with the local snapshot, compute daily-return correlations against ACTIVE alphas, and generate a Markdown lesson snippet.
-
-Recommended loop:
-
-1. Generate or modify candidate expressions from `SKILL.md`.
-2. Simulate and inspect IS checks on BRAIN.
-3. Pull all ACTIVE alphas and compare daily-return correlation.
-4. Run `python scripts/evolve_skill.py` to preview new lessons.
-5. Review the output manually.
-6. Run `python scripts/evolve_skill.py --apply` only for local/private updates.
-7. Publish only sanitized general rules, never raw account-linked records.
-
-## Contents
-
-```text
-wq-alpha-research/
-├── SKILL.md
-├── scripts/
-│   ├── evolve_skill.py
-│   └── submit_batch.py
-└── references/
-    ├── wq_usa_top3000_delay1_data_fields.csv
-    ├── wq_usa_top3000_delay1_data_fields.json
-    └── wq_usa_top3000_delay1_data_fields_summary.json
-```
-
-## What It Helps With
-
-- Search USA TOP3000 delay=1 BRAIN fields locally.
-- Build Alpha expressions from common WQ operator patterns.
-- Diagnose low Sharpe, low Fitness, high Turnover, concentrated weights, and sub-universe failures.
-- Compare candidate alphas against existing ACTIVE alphas using daily-return correlation.
-- Automate simulation/submission workflows with explicit post-submit status checks.
-- Evolve the skill from local alpha research notes without committing private records.
+- 51 China futures, excluding financial futures by default.
+- 30-bar forward return label.
+- 1,144 selected factors:
+  402 raw, 164 time-series z-score, 299 cross-sectional z-score, and
+  279 cross-sectional rank factors.
+- In-sample window defaults to 2018-2019.
+- OOS window defaults to 2020.
+- Baselines: Ridge and LightGBM.
+- Factor mining: IS/OOS single-factor IC with same-sign effective-factor filter.
+- Backtest: simple timestamp-level long-short spread on prediction ranks.
 
 ## Quick Start
 
-Read `SKILL.md` first. It contains the actual playbook and trigger instructions.
-
-For local field lookup:
-
-```python
-import json
-from pathlib import Path
-
-fields = json.loads(
-    Path("references/wq_usa_top3000_delay1_data_fields.json").read_text(encoding="utf-8")
-)
-
-keyword = "operating_income"
-matches = [
-    f for f in fields
-    if keyword in f["id"].lower()
-    or keyword in (f.get("description") or "").lower()
-]
-print(matches[:5])
+```bash
+cd /root/autodl-tmp/wq-alpha-research
+PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml audit-data
+PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml mine-factors
+PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml baseline --models ridge,lightgbm
+PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml incremental --sets 100,300,all
+PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml report
 ```
 
-## BRAIN Credentials
-
-Use environment variables:
+The same CLI is exposed as `fu-alpha` after installing the package:
 
 ```bash
-export WQ_BRAIN_USERNAME="your_username"
-export WQ_BRAIN_PASSWORD="your_password"
+pip install -e .
+fu-alpha --config configs/futures.yaml run-all
 ```
 
-Or create a local `credential.txt` file:
+## Rebuild Factors
 
-```json
-["your_username", "your_password"]
-```
-
-`credential.txt` is ignored by git. Do not commit real credentials, cookies, sessions, tokens, alpha databases, or submission results.
-
-## Scripts
-
-Preview skill evolution output without modifying files:
+If the final panel is missing, the loader can materialize 1,144 factors on the
+fly from intermediate month partitions. To rebuild those partitions from raw
+CSV files:
 
 ```bash
-python scripts/evolve_skill.py
+PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml \
+  build-partitions --start 2017-01-01 --end-exclusive 2021-01-01 --overwrite
 ```
 
-Apply updates to local `SKILL.md` and `alpha_db.json` after reviewing the preview:
+To write a final monolithic parquet from month partitions:
 
 ```bash
-python scripts/evolve_skill.py --apply
+PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml \
+  materialize-final --path /root/autodl-tmp/shared-nvme/feature_model/data_factors_big.parquet \
+  --start 2018-01-01 --end 2020-12-31
 ```
 
-Run the batch submission example:
+## Git Hygiene
 
-```bash
-python scripts/submit_batch.py
-```
+The repository intentionally ignores raw data, rebuilt parquet panels, model
+outputs, generated reports, and logs. The committed `references/futures`
+directory contains only small metadata:
 
-The scripts require `requests` and `numpy`. `alpha_db.json` is a local memory file and is intentionally ignored by git.
+- `selected_factors.txt`
+- `factor_catalog.csv`
 
-## Safety Notes
-
-The following files are intentionally ignored:
-
-- `credential.txt`
-- `alpha_db.json`
-- `batch_submit_results.json`
-- `.env`
-- Python caches and virtual environments
-
-If you want to publish research lessons from local runs, summarize them into general rules before adding them to `SKILL.md`. Do not publish raw alpha IDs, PnL series, account-linked submission statuses, or private candidate expressions.
+Do not commit `/root/autodl-tmp/quant/data/raw`, `selected_month_parts`,
+`data_factors_big.parquet`, or prediction parquet files.

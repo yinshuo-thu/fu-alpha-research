@@ -1,0 +1,20 @@
+# Local defaults for the AutoDL workspace. Override any value from the CLI.
+raw_data_dir: /root/autodl-tmp/quant/data/raw
+partition_dir: /root/autodl-tmp/shared-nvme/feature_model/selected_month_parts
+factor_panel_path: /root/autodl-tmp/shared-nvme/feature_model/data_factors_big.parquet
+selected_factors_path: references/futures/selected_factors.txt
+factor_catalog_path: references/futures/factor_catalog.csv
+output_dir: outputs
+reports_dir: reports/generated
+
+is_start: "2018-01-01"
+is_end: "2019-12-31"
+oos_start: "2020-01-01"
+oos_end: "2020-12-31"
+label_horizon: 30
+seed: 42
+
+excluded_symbols: ["T", "TF", "TS", "IF", "IC", "IH"]
+ridge_train_rows: 120000
+lgb_train_rows: 120000
+baseline_models: ["ridge", "lightgbm"]
