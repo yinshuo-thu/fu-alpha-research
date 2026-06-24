@@ -78,6 +78,7 @@ not merely duplicates of the original pool. The full reports are:
 
 - `reports/final_factor_mining_report.md`
 - `reports/factor_effectiveness_validation.md`
+- `references/futures/old_effective_factors_summary.json`
 
 ## Quick Start
 
