@@ -25,10 +25,46 @@ The project is designed for the AutoDL workspace layout:
 - Factor mining: IS/OOS single-factor IC with same-sign effective-factor filter.
 - Backtest: simple timestamp-level long-short spread on prediction ranks.
 
+## Validation Evidence
+
+The migrated project has been run end-to-end on the local futures panel with
+2018-2019 as in-sample data and 2020 as OOS data.
+
+Expression mining generated 4,000 new formula candidates. Under the same-sign
+IS/OOS IC screen (`abs(IS IC) >= 0.002`, `abs(OOS IC) >= 0.001`, coverage proxy
+>= 0.5), 2,535 candidates passed and the top 100 were selected as new effective
+factors.
+
+Model comparison on 2020 OOS, using `pred_xsz` IC:
+
+| Model | Feature set | Original IC | With 100 new factors | Delta |
+| --- | --- | ---: | ---: | ---: |
+| Ridge | top300 | 0.038573 | 0.039094 | +0.000521 |
+| Ridge | effective657 | 0.038414 | 0.039323 | +0.000909 |
+| Ridge | all1144 | 0.037073 | 0.037890 | +0.000817 |
+| LightGBM | top300 | 0.026351 | 0.025263 | -0.001088 |
+| LightGBM | effective657 | 0.025890 | 0.026199 | +0.000308 |
+| LightGBM | all1144 | 0.025679 | 0.025615 | -0.000065 |
+
+Model-specific factor validation was then run on the `new_all1244` universe
+using 2020-01 as the validation month:
+
+| Model | Test | Retained factors | Retained from new100 |
+| --- | --- | ---: | ---: |
+| Ridge | exact leave-one-factor-out retrain; remove if IC does not decline | 617 / 1244 | 51 / 100 |
+| LightGBM | single-factor standard-normal replacement; remove if IC does not decline | 643 / 1244 | 46 / 100 |
+
+The overlap between Ridge-retained and LightGBM-retained new factors is 26. This
+gives independent model-specific evidence that the mined expression factors are
+not merely duplicates of the original pool. The full reports are:
+
+- `reports/final_factor_mining_report.md`
+- `reports/factor_effectiveness_validation.md`
+
 ## Quick Start
 
 ```bash
-cd /root/autodl-tmp/wq-alpha-research
+cd /root/autodl-tmp/fu-alpha-research
 PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml audit-data
 PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml mine-factors
 PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml baseline --models ridge,lightgbm

@@ -80,8 +80,21 @@ def long_short_backtest(
     label_col: str = "label",
     quantile: float = 0.2,
 ) -> pd.DataFrame:
+    clean = df.dropna(subset=[pred_col, label_col]).copy()
+    if clean.empty:
+        return pd.DataFrame(columns=["datetime", "ls_return", "n"])
+    if pred_col.endswith("_xrank"):
+        lo = quantile - 0.5
+        hi = 0.5 - quantile
+        long_ret = clean.loc[clean[pred_col] >= hi].groupby("datetime", sort=True)[label_col].mean()
+        short_ret = clean.loc[clean[pred_col] <= lo].groupby("datetime", sort=True)[label_col].mean()
+        n = clean.groupby("datetime", sort=True)[label_col].size()
+        out = pd.concat([long_ret.rename("long"), short_ret.rename("short"), n.rename("n")], axis=1).dropna()
+        out["ls_return"] = out["long"] - out["short"]
+        return out.reset_index()[["datetime", "ls_return", "n"]]
+
     rows = []
-    for dt, grp in df.dropna(subset=[pred_col, label_col]).groupby("datetime", sort=True):
+    for dt, grp in clean.groupby("datetime", sort=True):
         if len(grp) < 10:
             continue
         lo = grp[pred_col].quantile(quantile)
