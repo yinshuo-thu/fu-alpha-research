@@ -41,6 +41,7 @@ def main() -> None:
     parser.add_argument("--month", required=True)
     parser.add_argument("--models", default="ridge,lgbm")
     parser.add_argument("--sets", default=None)
+    parser.add_argument("--expression-file", default=None)
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
 
@@ -77,7 +78,12 @@ def main() -> None:
         print(f"[predict-suite] nothing to do for {args.month}", flush=True)
         return
 
-    matrix = FeatureMatrix(cfg)
+    expr_path = None
+    if args.expression_file:
+        expr_path = Path(args.expression_file)
+        if not expr_path.is_absolute():
+            expr_path = cfg.output_dir / expr_path
+    matrix = FeatureMatrix(cfg, expr_path)
     df = matrix.read_month(args.month, union_features)
     base_out = df[["symbol", "datetime", "label"]].copy()
     print(

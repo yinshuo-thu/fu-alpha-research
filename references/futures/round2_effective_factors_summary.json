@@ -1,0 +1,2425 @@
+{
+  "schema_version": 1,
+  "artifact": "round2_effective_factors_summary",
+  "description": "Second 100-factor mining round with multi-layer skill selection and model-specific incremental validation.",
+  "project": "fu-alpha-research",
+  "created_date": "2026-06-24",
+  "validation_month": "2020-01",
+  "oos_window": {
+    "start": "2020-01",
+    "end": "2020-12"
+  },
+  "ic_view": "pred_xsz",
+  "generated_factor_reference": {
+    "source": "outputs/expression_sets/new100_round2.csv",
+    "combined_expression_file": "outputs/expression_sets/new200.csv",
+    "count": 100,
+    "generated_factors": [
+      {
+        "name": "nf_rank_spread_1ac56d174c",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_3_13",
+        "formula": "xrank(csz_willr_4) - xrank(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_z_add_07eac11367",
+        "op": "z_add",
+        "left": "csr_stoch_dev_42",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(csr_stoch_dev_42) + xzscore(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_67caee5ce9",
+        "op": "rank_add",
+        "left": "csz_macd_8_34",
+        "right": "csz_macd_3_13",
+        "formula": "xrank(csz_macd_8_34) + xrank(csz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_085ef6e1eb",
+        "op": "rank_add",
+        "left": "csz_macd_8_34",
+        "right": "macd_3_13",
+        "formula": "xrank(csz_macd_8_34) + xrank(macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_d0b67c68df",
+        "op": "rank_add",
+        "left": "csz_macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xrank(csz_macd_3_13) + xrank(macd_8_34)"
+      },
+      {
+        "name": "nf_rank_add_71a5d679aa",
+        "op": "rank_add",
+        "left": "macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xrank(macd_3_13) + xrank(macd_8_34)"
+      },
+      {
+        "name": "nf_z_add_4b099779c4",
+        "op": "z_add",
+        "left": "csz_macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xzscore(csz_macd_3_13) + xzscore(macd_8_34)"
+      },
+      {
+        "name": "nf_z_add_d4e2edc531",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xzscore(macd_3_13) + xzscore(macd_8_34)"
+      },
+      {
+        "name": "nf_z_add_b6a656f4cf",
+        "op": "z_add",
+        "left": "csz_macd_8_34",
+        "right": "csz_macd_3_13",
+        "formula": "xzscore(csz_macd_8_34) + xzscore(csz_macd_3_13)"
+      },
+      {
+        "name": "nf_z_add_3849925fc9",
+        "op": "z_add",
+        "left": "csz_macd_8_34",
+        "right": "macd_3_13",
+        "formula": "xzscore(csz_macd_8_34) + xzscore(macd_3_13)"
+      },
+      {
+        "name": "nf_z_add_02a91a078d",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_34",
+        "formula": "xzscore(macd_3_13) + xzscore(csr_stoch_dev_34)"
+      },
+      {
+        "name": "nf_z_spread_0e5c8c05b7",
+        "op": "z_spread",
+        "left": "macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xzscore(macd_5_21) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_spread_e39eba54ae",
+        "op": "z_spread",
+        "left": "csz_macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csz_macd_5_21) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_add_4264b5fb80",
+        "op": "rank_add",
+        "left": "csr_macd_10_42",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(csr_macd_10_42) + xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_z_add_0706f2d8fb",
+        "op": "z_add",
+        "left": "csr_stoch_dev_42",
+        "right": "csr_bop",
+        "formula": "xzscore(csr_stoch_dev_42) + xzscore(csr_bop)"
+      },
+      {
+        "name": "nf_rank_add_3ba60280d4",
+        "op": "rank_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_42",
+        "formula": "xrank(tsz_macd_5_21) + xrank(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_rank_add_943ea7474d",
+        "op": "rank_add",
+        "left": "csz_macd_3_13",
+        "right": "macd_3_13",
+        "formula": "xrank(csz_macd_3_13) + xrank(macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_e00bfbff31",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_8",
+        "right": "tsz_macd_8_34",
+        "formula": "xrank(csr_stoch_dev_8) + xrank(tsz_macd_8_34)"
+      },
+      {
+        "name": "nf_z_add_f2b251eeb3",
+        "op": "z_add",
+        "left": "macd_8_34",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(macd_8_34) + xzscore(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_z_add_cbc13c4adc",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_42",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_z_add_090a1faeed",
+        "op": "z_add",
+        "left": "csz_macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xzscore(csz_macd_5_21) + xzscore(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_z_add_cf5bd7e7af",
+        "op": "z_add",
+        "left": "macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xzscore(macd_5_21) + xzscore(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_z_add_b50dc17dcf",
+        "op": "z_add",
+        "left": "csr_macd_10_42",
+        "right": "tsz_macd_5_21",
+        "formula": "xzscore(csr_macd_10_42) + xzscore(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_z_add_fc497e73fd",
+        "op": "z_add",
+        "left": "macd_5_21",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(macd_5_21) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_rank_spread_90e6340a2a",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(csz_willr_4) - xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_add_3099b3b48f",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_42",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_42) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_rank_add_b4fdecde2a",
+        "op": "rank_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_8",
+        "formula": "xrank(tsz_macd_5_21) + xrank(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_z_add_a2a034a9d5",
+        "op": "z_add",
+        "left": "macd_8_34",
+        "right": "csr_stoch_dev_8",
+        "formula": "xzscore(macd_8_34) + xzscore(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_z_add_62bc971e5d",
+        "op": "z_add",
+        "left": "csr_stoch_dev_8",
+        "right": "tsz_macd_8_34",
+        "formula": "xzscore(csr_stoch_dev_8) + xzscore(tsz_macd_8_34)"
+      },
+      {
+        "name": "nf_z_add_0b3287ba49",
+        "op": "z_add",
+        "left": "csz_macd_3_13",
+        "right": "csr_stoch_dev_21",
+        "formula": "xzscore(csz_macd_3_13) + xzscore(csr_stoch_dev_21)"
+      },
+      {
+        "name": "nf_z_add_86dacf33ab",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_21",
+        "formula": "xzscore(macd_3_13) + xzscore(csr_stoch_dev_21)"
+      },
+      {
+        "name": "nf_z_spread_c2056e0361",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(csz_willr_4) - xzscore(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_spread_c2e09c322a",
+        "op": "rank_spread",
+        "left": "csz_macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xrank(csz_macd_5_21) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_spread_de575a94a5",
+        "op": "rank_spread",
+        "left": "macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xrank(macd_5_21) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_add_bb6412f627",
+        "op": "z_add",
+        "left": "macd_8_34",
+        "right": "csz_stoch_dev_10",
+        "formula": "xzscore(macd_8_34) + xzscore(csz_stoch_dev_10)"
+      },
+      {
+        "name": "nf_rank_add_ef81c42a10",
+        "op": "rank_add",
+        "left": "tsz_macd_5_21",
+        "right": "csz_stoch_dev_10",
+        "formula": "xrank(tsz_macd_5_21) + xrank(csz_stoch_dev_10)"
+      },
+      {
+        "name": "nf_z_add_4adcb06b2f",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_8",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_z_add_8f52666950",
+        "op": "z_add",
+        "left": "csr_macd_10_42",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(csr_macd_10_42) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_z_add_944df12b5e",
+        "op": "z_add",
+        "left": "csz_macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(csz_macd_3_13) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_z_add_e6b1a6511e",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(macd_3_13) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_z_add_43e1ea889d",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "csz_stoch_dev_10",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(csz_stoch_dev_10)"
+      },
+      {
+        "name": "nf_z_add_7103ccc366",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_9767512bcc",
+        "op": "rank_add",
+        "left": "csr_macd_10_42",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(csr_macd_10_42) + xrank(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_rank_add_94cd9febbc",
+        "op": "rank_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_34",
+        "formula": "xrank(macd_3_13) + xrank(csr_stoch_dev_34)"
+      },
+      {
+        "name": "nf_rank_add_bcc5324ebc",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_13",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_13) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_rank_add_f6cfb32133",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_16",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_16) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_rank_add_47d2f6c717",
+        "op": "rank_add",
+        "left": "csz_macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xrank(csz_macd_5_21) + xrank(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_rank_add_19f3f9dbf1",
+        "op": "rank_add",
+        "left": "macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xrank(macd_5_21) + xrank(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_rank_spread_9c8b11710d",
+        "op": "rank_spread",
+        "left": "csr_macd_10_42",
+        "right": "csz_willr_4",
+        "formula": "xrank(csr_macd_10_42) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_spread_c042cedb83",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_5_21",
+        "formula": "xzscore(csz_willr_4) - xzscore(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_add_b049c36d1b",
+        "op": "rank_add",
+        "left": "macd_5_21",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(macd_5_21) + xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_add_01c4289c61",
+        "op": "rank_add",
+        "left": "csz_macd_5_21",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(csz_macd_5_21) + xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_add_5a6636b9ec",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_8",
+        "right": "tsz_macd_3_13",
+        "formula": "xrank(csr_stoch_dev_8) + xrank(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_add804a7e9",
+        "op": "rank_add",
+        "left": "csr_macd_10_42",
+        "right": "csr_stoch_dev_16",
+        "formula": "xrank(csr_macd_10_42) + xrank(csr_stoch_dev_16)"
+      },
+      {
+        "name": "nf_rank_add_b2c19ed221",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_8",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_8) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_rank_add_29819b7cbc",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_34",
+        "right": "tsz_macd_3_13",
+        "formula": "xrank(csr_stoch_dev_34) + xrank(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_548350e026",
+        "op": "rank_add",
+        "left": "macd_8_34",
+        "right": "csr_stoch_dev_8",
+        "formula": "xrank(macd_8_34) + xrank(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_z_spread_d6aced37bc",
+        "op": "z_spread",
+        "left": "csr_macd_10_42",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csr_macd_10_42) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_spread_9d95136328",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "csr_stoch_dev_42",
+        "formula": "xrank(csz_willr_4) - xrank(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_z_spread_07c39f2423",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "csr_stoch_dev_42",
+        "formula": "xzscore(csz_willr_4) - xzscore(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_z_spread_ea28d46595",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "macd_8_34",
+        "formula": "xzscore(csz_willr_4) - xzscore(macd_8_34)"
+      },
+      {
+        "name": "nf_z_spread_95a3cb4f50",
+        "op": "z_spread",
+        "left": "csz_macd_8_34",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csz_macd_8_34) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_spread_62ee3031b4",
+        "op": "rank_spread",
+        "left": "csz_macd_8_34",
+        "right": "csz_willr_4",
+        "formula": "xrank(csz_macd_8_34) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_spread_1638d54c9c",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "macd_8_34",
+        "formula": "xrank(csz_willr_4) - xrank(macd_8_34)"
+      },
+      {
+        "name": "nf_rank_spread_50c9b7021f",
+        "op": "rank_spread",
+        "left": "tsz_macd_5_21",
+        "right": "csz_willr_6",
+        "formula": "xrank(tsz_macd_5_21) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_z_spread_ec56be6b74",
+        "op": "z_spread",
+        "left": "csz_px_sma_4",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csz_px_sma_4) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_spread_1b4611bb13",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "px_sma_4",
+        "formula": "xzscore(csz_willr_4) - xzscore(px_sma_4)"
+      },
+      {
+        "name": "nf_z_spread_781810127f",
+        "op": "z_spread",
+        "left": "tsz_macd_5_21",
+        "right": "csz_willr_6",
+        "formula": "xzscore(tsz_macd_5_21) - xzscore(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_spread_215bda2b86",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "csr_stoch_dev_16",
+        "formula": "xrank(csz_willr_4) - xrank(csr_stoch_dev_16)"
+      },
+      {
+        "name": "nf_rank_spread_173cf99857",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_42",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_42) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_z_spread_ea3978810d",
+        "op": "z_spread",
+        "left": "csr_stoch_dev_42",
+        "right": "csz_willr_6",
+        "formula": "xzscore(csr_stoch_dev_42) - xzscore(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_spread_daf34c86da",
+        "op": "rank_spread",
+        "left": "csz_px_sma_4",
+        "right": "csz_willr_4",
+        "formula": "xrank(csz_px_sma_4) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_spread_6f8857a97d",
+        "op": "z_spread",
+        "left": "macd_8_34",
+        "right": "csz_willr_6",
+        "formula": "xzscore(macd_8_34) - xzscore(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_gate_pos_ca84bbf12b",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "tsz_cpos",
+        "formula": "xrank(csr_cpos) * I[xrank(tsz_cpos) > 0]"
+      },
+      {
+        "name": "nf_rank_spread_6308a27871",
+        "op": "rank_spread",
+        "left": "macd_8_34",
+        "right": "csz_willr_6",
+        "formula": "xrank(macd_8_34) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_z_spread_2ea9a6c5b8",
+        "op": "z_spread",
+        "left": "px_sma_4",
+        "right": "csz_willr_6",
+        "formula": "xzscore(px_sma_4) - xzscore(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_spread_daedad3e47",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_8",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_8) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_spread_d7b1873a13",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_34",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_34) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_spread_232b725a83",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_16",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_16) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_gate_pos_d16fba78bc",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "csr_bollz_4",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_27438f62dc",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "csr_bollz_4",
+        "formula": "xrank(macd_3_13) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_c97f31668d",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "px_sma_4",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_2a676e57ff",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "px_sma_4",
+        "formula": "xrank(macd_3_13) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_9259c589dc",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "csz_px_sma_4",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(csz_px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_4b8df40e30",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "csz_px_sma_4",
+        "formula": "xrank(macd_3_13) * I[xrank(csz_px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_a120b8a737",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "macd_3_13",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(macd_3_13) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_8dc96978ea",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(csr_stoch_dev_13) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_ac57c12fc6",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(macd_3_13) * I[xrank(csr_stoch_dev_13) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_b5a654a789",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "macd_3_13",
+        "formula": "xrank(csr_cpos) * I[xrank(macd_3_13) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_5139583b64",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "px_sma_4",
+        "formula": "xrank(csr_cpos) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_e8e1c36b9e",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "csz_px_sma_4",
+        "formula": "xrank(csr_cpos) * I[xrank(csz_px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_35fb9006b1",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "csr_bollz_4",
+        "formula": "xrank(macd_5_21) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_624cc45df1",
+        "op": "rank_gate_pos",
+        "left": "tsz_cpos",
+        "right": "px_sma_4",
+        "formula": "xrank(tsz_cpos) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_f947466566",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "csr_bollz_4",
+        "formula": "xrank(csr_cpos) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_a0fe430550",
+        "op": "rank_gate_pos",
+        "left": "tsz_cpos",
+        "right": "csr_bollz_4",
+        "formula": "xrank(tsz_cpos) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_a5215be9d7",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "csr_stoch_dev_21",
+        "formula": "xrank(macd_5_21) * I[xrank(csr_stoch_dev_21) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_3ced7b81b0",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(macd_5_21) * I[xrank(csr_stoch_dev_13) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_ae14264ff0",
+        "op": "rank_gate_pos",
+        "left": "tsz_cpos",
+        "right": "csr_stoch_dev_8",
+        "formula": "xrank(tsz_cpos) * I[xrank(csr_stoch_dev_8) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_672be8663e",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_5_21",
+        "right": "px_sma_4",
+        "formula": "xrank(csz_macd_5_21) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_f9eb1f2c30",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "px_sma_4",
+        "formula": "xrank(macd_5_21) * I[xrank(px_sma_4) > 0]"
+      }
+    ]
+  },
+  "ridge": {
+    "method": "exact leave-one-factor-out retrain; retain if removing the factor lowers validation-month pred_xsz IC",
+    "generated_candidates": 100,
+    "retained_new_factors": 42,
+    "removed_new_factors": 58,
+    "final_feature_count": 659,
+    "ic": {
+      "base617": {
+        "total_ic_2020": 0.0410143791528091,
+        "monthly_mean": 0.044639707512488,
+        "monthly_ir": 2.7098802631462138
+      },
+      "plus100_candidates": {
+        "total_ic_2020": 0.0410644034237439,
+        "monthly_mean": 0.0446918873615737,
+        "monthly_ir": 2.72787344199427
+      },
+      "plus42_retained": {
+        "total_ic_2020": 0.041070625831177,
+        "monthly_mean": 0.0446989501288108,
+        "monthly_ir": 2.7079095443002736
+      },
+      "delta_plus100_vs_base": 5.002427093479811e-05,
+      "delta_retained_vs_base": 5.624667836789943e-05,
+      "delta_retained_vs_plus100": 6.222407433101318e-06,
+      "base_2020_01": 0.0854842366223281,
+      "plus100_2020_01": 0.0852201295228063,
+      "plus42_2020_01": 0.0857054698670723
+    },
+    "retained_new_factor_names": [
+      "nf_rank_gate_pos_f947466566",
+      "nf_z_add_a2a034a9d5",
+      "nf_rank_gate_pos_a5215be9d7",
+      "nf_rank_gate_pos_a0fe430550",
+      "nf_rank_spread_9c8b11710d",
+      "nf_rank_gate_pos_3ced7b81b0",
+      "nf_rank_spread_6308a27871",
+      "nf_rank_spread_50c9b7021f",
+      "nf_rank_spread_173cf99857",
+      "nf_rank_spread_90e6340a2a",
+      "nf_rank_spread_1ac56d174c",
+      "nf_z_spread_781810127f",
+      "nf_rank_gate_pos_b5a654a789",
+      "nf_rank_add_548350e026",
+      "nf_z_add_02a91a078d",
+      "nf_z_add_8f52666950",
+      "nf_rank_add_9767512bcc",
+      "nf_rank_add_b049c36d1b",
+      "nf_rank_add_01c4289c61",
+      "nf_z_add_43e1ea889d",
+      "nf_z_add_cf5bd7e7af",
+      "nf_z_add_090a1faeed",
+      "nf_z_spread_d6aced37bc",
+      "nf_rank_add_bcc5324ebc",
+      "nf_z_add_86dacf33ab",
+      "nf_z_add_0b3287ba49",
+      "nf_z_spread_c2056e0361",
+      "nf_rank_spread_daedad3e47",
+      "nf_z_add_07eac11367",
+      "nf_rank_add_085ef6e1eb",
+      "nf_rank_add_67caee5ce9",
+      "nf_rank_add_d0b67c68df",
+      "nf_rank_add_71a5d679aa",
+      "nf_rank_add_3099b3b48f",
+      "nf_rank_gate_pos_2a676e57ff",
+      "nf_rank_gate_pos_c97f31668d",
+      "nf_rank_gate_pos_4b8df40e30",
+      "nf_rank_gate_pos_9259c589dc",
+      "nf_z_add_0706f2d8fb",
+      "nf_z_add_cbc13c4adc",
+      "nf_z_add_4adcb06b2f",
+      "nf_z_add_7103ccc366"
+    ],
+    "removed_new_factor_names": [
+      "nf_z_spread_95a3cb4f50",
+      "nf_z_spread_ea28d46595",
+      "nf_z_spread_e39eba54ae",
+      "nf_z_spread_0e5c8c05b7",
+      "nf_rank_add_4264b5fb80",
+      "nf_rank_add_ef81c42a10",
+      "nf_z_spread_c042cedb83",
+      "nf_rank_spread_de575a94a5",
+      "nf_rank_spread_c2e09c322a",
+      "nf_rank_gate_pos_672be8663e",
+      "nf_rank_gate_pos_f9eb1f2c30",
+      "nf_rank_add_29819b7cbc",
+      "nf_rank_add_5a6636b9ec",
+      "nf_z_add_f2b251eeb3",
+      "nf_rank_spread_1638d54c9c",
+      "nf_rank_spread_62ee3031b4",
+      "nf_rank_gate_pos_35fb9006b1",
+      "nf_rank_add_b2c19ed221",
+      "nf_rank_add_f6cfb32133",
+      "nf_rank_add_3ba60280d4",
+      "nf_rank_add_943ea7474d",
+      "nf_rank_add_47d2f6c717",
+      "nf_z_add_bb6412f627",
+      "nf_rank_spread_9d95136328",
+      "nf_z_add_62bc971e5d",
+      "nf_rank_add_b4fdecde2a",
+      "nf_z_add_b50dc17dcf",
+      "nf_rank_add_19f3f9dbf1",
+      "nf_rank_spread_232b725a83",
+      "nf_rank_gate_pos_ae14264ff0",
+      "nf_rank_spread_215bda2b86",
+      "nf_z_spread_6f8857a97d",
+      "nf_z_add_fc497e73fd",
+      "nf_rank_add_add804a7e9",
+      "nf_z_add_4b099779c4",
+      "nf_z_add_b6a656f4cf",
+      "nf_z_add_d4e2edc531",
+      "nf_z_add_3849925fc9",
+      "nf_rank_spread_daf34c86da",
+      "nf_z_add_944df12b5e",
+      "nf_z_add_e6b1a6511e",
+      "nf_rank_add_e00bfbff31",
+      "nf_z_spread_ea3978810d",
+      "nf_rank_add_94cd9febbc",
+      "nf_rank_gate_pos_a120b8a737",
+      "nf_rank_gate_pos_5139583b64",
+      "nf_rank_gate_pos_e8e1c36b9e",
+      "nf_z_spread_07c39f2423",
+      "nf_rank_gate_pos_ac57c12fc6",
+      "nf_rank_gate_pos_8dc96978ea",
+      "nf_rank_gate_pos_ca84bbf12b",
+      "nf_rank_gate_pos_624cc45df1",
+      "nf_rank_spread_d7b1873a13",
+      "nf_rank_gate_pos_d16fba78bc",
+      "nf_rank_gate_pos_27438f62dc",
+      "nf_z_spread_ec56be6b74",
+      "nf_z_spread_1b4611bb13",
+      "nf_z_spread_2ea9a6c5b8"
+    ],
+    "source_files": {
+      "base_feature_set": "outputs/model_feature_sets/ridge_validated617.txt",
+      "candidate_feature_set": "outputs/model_feature_sets/ridge617_plus_round2_100.txt",
+      "retained_feature_set": "outputs/model_feature_sets/ridge617_plus_round2_retained42.txt"
+    },
+    "retained_new_factor_expressions": [
+      {
+        "name": "nf_rank_gate_pos_f947466566",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "csr_bollz_4",
+        "formula": "xrank(csr_cpos) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_z_add_a2a034a9d5",
+        "op": "z_add",
+        "left": "macd_8_34",
+        "right": "csr_stoch_dev_8",
+        "formula": "xzscore(macd_8_34) + xzscore(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_rank_gate_pos_a5215be9d7",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "csr_stoch_dev_21",
+        "formula": "xrank(macd_5_21) * I[xrank(csr_stoch_dev_21) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_a0fe430550",
+        "op": "rank_gate_pos",
+        "left": "tsz_cpos",
+        "right": "csr_bollz_4",
+        "formula": "xrank(tsz_cpos) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_spread_9c8b11710d",
+        "op": "rank_spread",
+        "left": "csr_macd_10_42",
+        "right": "csz_willr_4",
+        "formula": "xrank(csr_macd_10_42) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_gate_pos_3ced7b81b0",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(macd_5_21) * I[xrank(csr_stoch_dev_13) > 0]"
+      },
+      {
+        "name": "nf_rank_spread_6308a27871",
+        "op": "rank_spread",
+        "left": "macd_8_34",
+        "right": "csz_willr_6",
+        "formula": "xrank(macd_8_34) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_spread_50c9b7021f",
+        "op": "rank_spread",
+        "left": "tsz_macd_5_21",
+        "right": "csz_willr_6",
+        "formula": "xrank(tsz_macd_5_21) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_spread_173cf99857",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_42",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_42) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_spread_90e6340a2a",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(csz_willr_4) - xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_spread_1ac56d174c",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_3_13",
+        "formula": "xrank(csz_willr_4) - xrank(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_z_spread_781810127f",
+        "op": "z_spread",
+        "left": "tsz_macd_5_21",
+        "right": "csz_willr_6",
+        "formula": "xzscore(tsz_macd_5_21) - xzscore(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_gate_pos_b5a654a789",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "macd_3_13",
+        "formula": "xrank(csr_cpos) * I[xrank(macd_3_13) > 0]"
+      },
+      {
+        "name": "nf_rank_add_548350e026",
+        "op": "rank_add",
+        "left": "macd_8_34",
+        "right": "csr_stoch_dev_8",
+        "formula": "xrank(macd_8_34) + xrank(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_z_add_02a91a078d",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_34",
+        "formula": "xzscore(macd_3_13) + xzscore(csr_stoch_dev_34)"
+      },
+      {
+        "name": "nf_z_add_8f52666950",
+        "op": "z_add",
+        "left": "csr_macd_10_42",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(csr_macd_10_42) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_rank_add_9767512bcc",
+        "op": "rank_add",
+        "left": "csr_macd_10_42",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(csr_macd_10_42) + xrank(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_rank_add_b049c36d1b",
+        "op": "rank_add",
+        "left": "macd_5_21",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(macd_5_21) + xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_add_01c4289c61",
+        "op": "rank_add",
+        "left": "csz_macd_5_21",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(csz_macd_5_21) + xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_z_add_43e1ea889d",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "csz_stoch_dev_10",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(csz_stoch_dev_10)"
+      },
+      {
+        "name": "nf_z_add_cf5bd7e7af",
+        "op": "z_add",
+        "left": "macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xzscore(macd_5_21) + xzscore(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_z_add_090a1faeed",
+        "op": "z_add",
+        "left": "csz_macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xzscore(csz_macd_5_21) + xzscore(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_z_spread_d6aced37bc",
+        "op": "z_spread",
+        "left": "csr_macd_10_42",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csr_macd_10_42) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_add_bcc5324ebc",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_13",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_13) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_z_add_86dacf33ab",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_21",
+        "formula": "xzscore(macd_3_13) + xzscore(csr_stoch_dev_21)"
+      },
+      {
+        "name": "nf_z_add_0b3287ba49",
+        "op": "z_add",
+        "left": "csz_macd_3_13",
+        "right": "csr_stoch_dev_21",
+        "formula": "xzscore(csz_macd_3_13) + xzscore(csr_stoch_dev_21)"
+      },
+      {
+        "name": "nf_z_spread_c2056e0361",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(csz_willr_4) - xzscore(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_spread_daedad3e47",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_8",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_8) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_z_add_07eac11367",
+        "op": "z_add",
+        "left": "csr_stoch_dev_42",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(csr_stoch_dev_42) + xzscore(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_085ef6e1eb",
+        "op": "rank_add",
+        "left": "csz_macd_8_34",
+        "right": "macd_3_13",
+        "formula": "xrank(csz_macd_8_34) + xrank(macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_67caee5ce9",
+        "op": "rank_add",
+        "left": "csz_macd_8_34",
+        "right": "csz_macd_3_13",
+        "formula": "xrank(csz_macd_8_34) + xrank(csz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_d0b67c68df",
+        "op": "rank_add",
+        "left": "csz_macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xrank(csz_macd_3_13) + xrank(macd_8_34)"
+      },
+      {
+        "name": "nf_rank_add_71a5d679aa",
+        "op": "rank_add",
+        "left": "macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xrank(macd_3_13) + xrank(macd_8_34)"
+      },
+      {
+        "name": "nf_rank_add_3099b3b48f",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_42",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_42) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_rank_gate_pos_2a676e57ff",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "px_sma_4",
+        "formula": "xrank(macd_3_13) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_c97f31668d",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "px_sma_4",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_4b8df40e30",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "csz_px_sma_4",
+        "formula": "xrank(macd_3_13) * I[xrank(csz_px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_9259c589dc",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "csz_px_sma_4",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(csz_px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_z_add_0706f2d8fb",
+        "op": "z_add",
+        "left": "csr_stoch_dev_42",
+        "right": "csr_bop",
+        "formula": "xzscore(csr_stoch_dev_42) + xzscore(csr_bop)"
+      },
+      {
+        "name": "nf_z_add_cbc13c4adc",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_42",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_z_add_4adcb06b2f",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_8",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_z_add_7103ccc366",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(tsz_macd_3_13)"
+      }
+    ],
+    "removed_new_factor_expressions": [
+      {
+        "name": "nf_z_spread_95a3cb4f50",
+        "op": "z_spread",
+        "left": "csz_macd_8_34",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csz_macd_8_34) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_spread_ea28d46595",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "macd_8_34",
+        "formula": "xzscore(csz_willr_4) - xzscore(macd_8_34)"
+      },
+      {
+        "name": "nf_z_spread_e39eba54ae",
+        "op": "z_spread",
+        "left": "csz_macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csz_macd_5_21) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_spread_0e5c8c05b7",
+        "op": "z_spread",
+        "left": "macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xzscore(macd_5_21) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_add_4264b5fb80",
+        "op": "rank_add",
+        "left": "csr_macd_10_42",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(csr_macd_10_42) + xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_add_ef81c42a10",
+        "op": "rank_add",
+        "left": "tsz_macd_5_21",
+        "right": "csz_stoch_dev_10",
+        "formula": "xrank(tsz_macd_5_21) + xrank(csz_stoch_dev_10)"
+      },
+      {
+        "name": "nf_z_spread_c042cedb83",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_5_21",
+        "formula": "xzscore(csz_willr_4) - xzscore(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_spread_de575a94a5",
+        "op": "rank_spread",
+        "left": "macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xrank(macd_5_21) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_spread_c2e09c322a",
+        "op": "rank_spread",
+        "left": "csz_macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xrank(csz_macd_5_21) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_gate_pos_672be8663e",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_5_21",
+        "right": "px_sma_4",
+        "formula": "xrank(csz_macd_5_21) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_f9eb1f2c30",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "px_sma_4",
+        "formula": "xrank(macd_5_21) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_add_29819b7cbc",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_34",
+        "right": "tsz_macd_3_13",
+        "formula": "xrank(csr_stoch_dev_34) + xrank(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_5a6636b9ec",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_8",
+        "right": "tsz_macd_3_13",
+        "formula": "xrank(csr_stoch_dev_8) + xrank(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_z_add_f2b251eeb3",
+        "op": "z_add",
+        "left": "macd_8_34",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(macd_8_34) + xzscore(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_spread_1638d54c9c",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "macd_8_34",
+        "formula": "xrank(csz_willr_4) - xrank(macd_8_34)"
+      },
+      {
+        "name": "nf_rank_spread_62ee3031b4",
+        "op": "rank_spread",
+        "left": "csz_macd_8_34",
+        "right": "csz_willr_4",
+        "formula": "xrank(csz_macd_8_34) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_gate_pos_35fb9006b1",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "csr_bollz_4",
+        "formula": "xrank(macd_5_21) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_add_b2c19ed221",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_8",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_8) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_rank_add_f6cfb32133",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_16",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_16) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_rank_add_3ba60280d4",
+        "op": "rank_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_42",
+        "formula": "xrank(tsz_macd_5_21) + xrank(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_rank_add_943ea7474d",
+        "op": "rank_add",
+        "left": "csz_macd_3_13",
+        "right": "macd_3_13",
+        "formula": "xrank(csz_macd_3_13) + xrank(macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_47d2f6c717",
+        "op": "rank_add",
+        "left": "csz_macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xrank(csz_macd_5_21) + xrank(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_z_add_bb6412f627",
+        "op": "z_add",
+        "left": "macd_8_34",
+        "right": "csz_stoch_dev_10",
+        "formula": "xzscore(macd_8_34) + xzscore(csz_stoch_dev_10)"
+      },
+      {
+        "name": "nf_rank_spread_9d95136328",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "csr_stoch_dev_42",
+        "formula": "xrank(csz_willr_4) - xrank(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_z_add_62bc971e5d",
+        "op": "z_add",
+        "left": "csr_stoch_dev_8",
+        "right": "tsz_macd_8_34",
+        "formula": "xzscore(csr_stoch_dev_8) + xzscore(tsz_macd_8_34)"
+      },
+      {
+        "name": "nf_rank_add_b4fdecde2a",
+        "op": "rank_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_8",
+        "formula": "xrank(tsz_macd_5_21) + xrank(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_z_add_b50dc17dcf",
+        "op": "z_add",
+        "left": "csr_macd_10_42",
+        "right": "tsz_macd_5_21",
+        "formula": "xzscore(csr_macd_10_42) + xzscore(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_add_19f3f9dbf1",
+        "op": "rank_add",
+        "left": "macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xrank(macd_5_21) + xrank(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_rank_spread_232b725a83",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_16",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_16) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_gate_pos_ae14264ff0",
+        "op": "rank_gate_pos",
+        "left": "tsz_cpos",
+        "right": "csr_stoch_dev_8",
+        "formula": "xrank(tsz_cpos) * I[xrank(csr_stoch_dev_8) > 0]"
+      },
+      {
+        "name": "nf_rank_spread_215bda2b86",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "csr_stoch_dev_16",
+        "formula": "xrank(csz_willr_4) - xrank(csr_stoch_dev_16)"
+      },
+      {
+        "name": "nf_z_spread_6f8857a97d",
+        "op": "z_spread",
+        "left": "macd_8_34",
+        "right": "csz_willr_6",
+        "formula": "xzscore(macd_8_34) - xzscore(csz_willr_6)"
+      },
+      {
+        "name": "nf_z_add_fc497e73fd",
+        "op": "z_add",
+        "left": "macd_5_21",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(macd_5_21) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_rank_add_add804a7e9",
+        "op": "rank_add",
+        "left": "csr_macd_10_42",
+        "right": "csr_stoch_dev_16",
+        "formula": "xrank(csr_macd_10_42) + xrank(csr_stoch_dev_16)"
+      },
+      {
+        "name": "nf_z_add_4b099779c4",
+        "op": "z_add",
+        "left": "csz_macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xzscore(csz_macd_3_13) + xzscore(macd_8_34)"
+      },
+      {
+        "name": "nf_z_add_b6a656f4cf",
+        "op": "z_add",
+        "left": "csz_macd_8_34",
+        "right": "csz_macd_3_13",
+        "formula": "xzscore(csz_macd_8_34) + xzscore(csz_macd_3_13)"
+      },
+      {
+        "name": "nf_z_add_d4e2edc531",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xzscore(macd_3_13) + xzscore(macd_8_34)"
+      },
+      {
+        "name": "nf_z_add_3849925fc9",
+        "op": "z_add",
+        "left": "csz_macd_8_34",
+        "right": "macd_3_13",
+        "formula": "xzscore(csz_macd_8_34) + xzscore(macd_3_13)"
+      },
+      {
+        "name": "nf_rank_spread_daf34c86da",
+        "op": "rank_spread",
+        "left": "csz_px_sma_4",
+        "right": "csz_willr_4",
+        "formula": "xrank(csz_px_sma_4) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_add_944df12b5e",
+        "op": "z_add",
+        "left": "csz_macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(csz_macd_3_13) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_z_add_e6b1a6511e",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(macd_3_13) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_rank_add_e00bfbff31",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_8",
+        "right": "tsz_macd_8_34",
+        "formula": "xrank(csr_stoch_dev_8) + xrank(tsz_macd_8_34)"
+      },
+      {
+        "name": "nf_z_spread_ea3978810d",
+        "op": "z_spread",
+        "left": "csr_stoch_dev_42",
+        "right": "csz_willr_6",
+        "formula": "xzscore(csr_stoch_dev_42) - xzscore(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_add_94cd9febbc",
+        "op": "rank_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_34",
+        "formula": "xrank(macd_3_13) + xrank(csr_stoch_dev_34)"
+      },
+      {
+        "name": "nf_rank_gate_pos_a120b8a737",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "macd_3_13",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(macd_3_13) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_5139583b64",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "px_sma_4",
+        "formula": "xrank(csr_cpos) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_e8e1c36b9e",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "csz_px_sma_4",
+        "formula": "xrank(csr_cpos) * I[xrank(csz_px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_z_spread_07c39f2423",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "csr_stoch_dev_42",
+        "formula": "xzscore(csz_willr_4) - xzscore(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_rank_gate_pos_ac57c12fc6",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(macd_3_13) * I[xrank(csr_stoch_dev_13) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_8dc96978ea",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(csr_stoch_dev_13) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_ca84bbf12b",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "tsz_cpos",
+        "formula": "xrank(csr_cpos) * I[xrank(tsz_cpos) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_624cc45df1",
+        "op": "rank_gate_pos",
+        "left": "tsz_cpos",
+        "right": "px_sma_4",
+        "formula": "xrank(tsz_cpos) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_spread_d7b1873a13",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_34",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_34) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_gate_pos_d16fba78bc",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "csr_bollz_4",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_27438f62dc",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "csr_bollz_4",
+        "formula": "xrank(macd_3_13) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_z_spread_ec56be6b74",
+        "op": "z_spread",
+        "left": "csz_px_sma_4",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csz_px_sma_4) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_spread_1b4611bb13",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "px_sma_4",
+        "formula": "xzscore(csz_willr_4) - xzscore(px_sma_4)"
+      },
+      {
+        "name": "nf_z_spread_2ea9a6c5b8",
+        "op": "z_spread",
+        "left": "px_sma_4",
+        "right": "csz_willr_6",
+        "formula": "xzscore(px_sma_4) - xzscore(csz_willr_6)"
+      }
+    ]
+  },
+  "lightgbm": {
+    "method": "single-factor standard-normal replacement; retain if replacement lowers validation-month pred_xsz IC",
+    "generated_candidates": 100,
+    "retained_new_factors": 40,
+    "removed_new_factors": 60,
+    "final_feature_count": 683,
+    "ic": {
+      "base643": {
+        "total_ic_2020": 0.0252160720465478,
+        "monthly_mean": 0.0265336384077275,
+        "monthly_ir": 3.073993943050524
+      },
+      "plus100_candidates": {
+        "total_ic_2020": 0.0258522880426366,
+        "monthly_mean": 0.027145193946299,
+        "monthly_ir": 2.5952130369191035
+      },
+      "plus40_retained": {
+        "total_ic_2020": 0.0261214828911051,
+        "monthly_mean": 0.0274241728310135,
+        "monthly_ir": 3.185132188460885
+      },
+      "delta_plus100_vs_base": 0.0006362159960888007,
+      "delta_retained_vs_base": 0.0009054108445573014,
+      "delta_retained_vs_plus100": 0.0002691948484685007,
+      "base_2020_01": 0.0443391412072511,
+      "plus100_2020_01": 0.0483576766669249,
+      "plus40_2020_01": 0.0471029499475
+    },
+    "retained_new_factor_names": [
+      "nf_rank_gate_pos_ca84bbf12b",
+      "nf_rank_spread_daf34c86da",
+      "nf_rank_gate_pos_2a676e57ff",
+      "nf_rank_gate_pos_8dc96978ea",
+      "nf_z_add_944df12b5e",
+      "nf_z_add_4adcb06b2f",
+      "nf_z_add_e6b1a6511e",
+      "nf_rank_add_9767512bcc",
+      "nf_rank_add_e00bfbff31",
+      "nf_rank_gate_pos_ae14264ff0",
+      "nf_rank_spread_d7b1873a13",
+      "nf_z_add_cbc13c4adc",
+      "nf_rank_add_f6cfb32133",
+      "nf_z_add_bb6412f627",
+      "nf_rank_spread_9c8b11710d",
+      "nf_z_add_62bc971e5d",
+      "nf_rank_add_47d2f6c717",
+      "nf_z_spread_ec56be6b74",
+      "nf_rank_spread_232b725a83",
+      "nf_rank_gate_pos_d16fba78bc",
+      "nf_z_spread_e39eba54ae",
+      "nf_z_add_b50dc17dcf",
+      "nf_rank_add_943ea7474d",
+      "nf_z_add_b6a656f4cf",
+      "nf_rank_spread_1638d54c9c",
+      "nf_rank_gate_pos_624cc45df1",
+      "nf_z_add_7103ccc366",
+      "nf_z_spread_6f8857a97d",
+      "nf_rank_gate_pos_672be8663e",
+      "nf_rank_spread_62ee3031b4",
+      "nf_z_spread_0e5c8c05b7",
+      "nf_z_add_090a1faeed",
+      "nf_rank_add_01c4289c61",
+      "nf_rank_gate_pos_b5a654a789",
+      "nf_rank_gate_pos_a120b8a737",
+      "nf_z_add_cf5bd7e7af",
+      "nf_rank_add_bcc5324ebc",
+      "nf_z_spread_781810127f",
+      "nf_rank_gate_pos_a5215be9d7",
+      "nf_z_add_07eac11367"
+    ],
+    "removed_new_factor_names": [
+      "nf_rank_gate_pos_ac57c12fc6",
+      "nf_rank_gate_pos_f9eb1f2c30",
+      "nf_rank_gate_pos_4b8df40e30",
+      "nf_z_add_43e1ea889d",
+      "nf_z_spread_d6aced37bc",
+      "nf_rank_add_71a5d679aa",
+      "nf_z_add_3849925fc9",
+      "nf_z_spread_95a3cb4f50",
+      "nf_rank_add_add804a7e9",
+      "nf_rank_add_67caee5ce9",
+      "nf_rank_spread_173cf99857",
+      "nf_rank_gate_pos_c97f31668d",
+      "nf_rank_add_19f3f9dbf1",
+      "nf_rank_add_29819b7cbc",
+      "nf_rank_add_085ef6e1eb",
+      "nf_z_add_a2a034a9d5",
+      "nf_rank_gate_pos_35fb9006b1",
+      "nf_rank_gate_pos_9259c589dc",
+      "nf_rank_add_94cd9febbc",
+      "nf_z_spread_07c39f2423",
+      "nf_rank_spread_c2e09c322a",
+      "nf_z_add_0b3287ba49",
+      "nf_z_add_86dacf33ab",
+      "nf_z_add_0706f2d8fb",
+      "nf_rank_add_d0b67c68df",
+      "nf_rank_add_3099b3b48f",
+      "nf_rank_add_b2c19ed221",
+      "nf_rank_gate_pos_3ced7b81b0",
+      "nf_rank_gate_pos_f947466566",
+      "nf_rank_spread_6308a27871",
+      "nf_rank_add_5a6636b9ec",
+      "nf_rank_gate_pos_a0fe430550",
+      "nf_rank_add_4264b5fb80",
+      "nf_rank_spread_daedad3e47",
+      "nf_z_add_f2b251eeb3",
+      "nf_rank_add_548350e026",
+      "nf_rank_add_3ba60280d4",
+      "nf_rank_spread_de575a94a5",
+      "nf_rank_spread_50c9b7021f",
+      "nf_rank_gate_pos_e8e1c36b9e",
+      "nf_z_spread_ea28d46595",
+      "nf_z_spread_ea3978810d",
+      "nf_z_add_02a91a078d",
+      "nf_rank_spread_215bda2b86",
+      "nf_z_add_8f52666950",
+      "nf_z_spread_c2056e0361",
+      "nf_rank_add_b049c36d1b",
+      "nf_z_spread_c042cedb83",
+      "nf_z_spread_2ea9a6c5b8",
+      "nf_z_add_d4e2edc531",
+      "nf_rank_spread_9d95136328",
+      "nf_rank_gate_pos_5139583b64",
+      "nf_rank_spread_90e6340a2a",
+      "nf_rank_add_b4fdecde2a",
+      "nf_rank_spread_1ac56d174c",
+      "nf_rank_gate_pos_27438f62dc",
+      "nf_rank_add_ef81c42a10",
+      "nf_z_add_fc497e73fd",
+      "nf_z_spread_1b4611bb13",
+      "nf_z_add_4b099779c4"
+    ],
+    "source_files": {
+      "base_feature_set": "outputs/model_feature_sets/lgbm_validated643.txt",
+      "candidate_feature_set": "outputs/model_feature_sets/lgbm643_plus_round2_100.txt",
+      "retained_feature_set": "outputs/model_feature_sets/lgbm643_plus_round2_retained40.txt"
+    },
+    "retained_new_factor_expressions": [
+      {
+        "name": "nf_rank_gate_pos_ca84bbf12b",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "tsz_cpos",
+        "formula": "xrank(csr_cpos) * I[xrank(tsz_cpos) > 0]"
+      },
+      {
+        "name": "nf_rank_spread_daf34c86da",
+        "op": "rank_spread",
+        "left": "csz_px_sma_4",
+        "right": "csz_willr_4",
+        "formula": "xrank(csz_px_sma_4) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_gate_pos_2a676e57ff",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "px_sma_4",
+        "formula": "xrank(macd_3_13) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_8dc96978ea",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(csr_stoch_dev_13) > 0]"
+      },
+      {
+        "name": "nf_z_add_944df12b5e",
+        "op": "z_add",
+        "left": "csz_macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(csz_macd_3_13) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_z_add_4adcb06b2f",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_8",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_z_add_e6b1a6511e",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(macd_3_13) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_rank_add_9767512bcc",
+        "op": "rank_add",
+        "left": "csr_macd_10_42",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(csr_macd_10_42) + xrank(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_rank_add_e00bfbff31",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_8",
+        "right": "tsz_macd_8_34",
+        "formula": "xrank(csr_stoch_dev_8) + xrank(tsz_macd_8_34)"
+      },
+      {
+        "name": "nf_rank_gate_pos_ae14264ff0",
+        "op": "rank_gate_pos",
+        "left": "tsz_cpos",
+        "right": "csr_stoch_dev_8",
+        "formula": "xrank(tsz_cpos) * I[xrank(csr_stoch_dev_8) > 0]"
+      },
+      {
+        "name": "nf_rank_spread_d7b1873a13",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_34",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_34) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_z_add_cbc13c4adc",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_42",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_rank_add_f6cfb32133",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_16",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_16) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_z_add_bb6412f627",
+        "op": "z_add",
+        "left": "macd_8_34",
+        "right": "csz_stoch_dev_10",
+        "formula": "xzscore(macd_8_34) + xzscore(csz_stoch_dev_10)"
+      },
+      {
+        "name": "nf_rank_spread_9c8b11710d",
+        "op": "rank_spread",
+        "left": "csr_macd_10_42",
+        "right": "csz_willr_4",
+        "formula": "xrank(csr_macd_10_42) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_add_62bc971e5d",
+        "op": "z_add",
+        "left": "csr_stoch_dev_8",
+        "right": "tsz_macd_8_34",
+        "formula": "xzscore(csr_stoch_dev_8) + xzscore(tsz_macd_8_34)"
+      },
+      {
+        "name": "nf_rank_add_47d2f6c717",
+        "op": "rank_add",
+        "left": "csz_macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xrank(csz_macd_5_21) + xrank(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_z_spread_ec56be6b74",
+        "op": "z_spread",
+        "left": "csz_px_sma_4",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csz_px_sma_4) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_spread_232b725a83",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_16",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_16) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_gate_pos_d16fba78bc",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "csr_bollz_4",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_z_spread_e39eba54ae",
+        "op": "z_spread",
+        "left": "csz_macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csz_macd_5_21) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_add_b50dc17dcf",
+        "op": "z_add",
+        "left": "csr_macd_10_42",
+        "right": "tsz_macd_5_21",
+        "formula": "xzscore(csr_macd_10_42) + xzscore(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_add_943ea7474d",
+        "op": "rank_add",
+        "left": "csz_macd_3_13",
+        "right": "macd_3_13",
+        "formula": "xrank(csz_macd_3_13) + xrank(macd_3_13)"
+      },
+      {
+        "name": "nf_z_add_b6a656f4cf",
+        "op": "z_add",
+        "left": "csz_macd_8_34",
+        "right": "csz_macd_3_13",
+        "formula": "xzscore(csz_macd_8_34) + xzscore(csz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_spread_1638d54c9c",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "macd_8_34",
+        "formula": "xrank(csz_willr_4) - xrank(macd_8_34)"
+      },
+      {
+        "name": "nf_rank_gate_pos_624cc45df1",
+        "op": "rank_gate_pos",
+        "left": "tsz_cpos",
+        "right": "px_sma_4",
+        "formula": "xrank(tsz_cpos) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_z_add_7103ccc366",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_z_spread_6f8857a97d",
+        "op": "z_spread",
+        "left": "macd_8_34",
+        "right": "csz_willr_6",
+        "formula": "xzscore(macd_8_34) - xzscore(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_gate_pos_672be8663e",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_5_21",
+        "right": "px_sma_4",
+        "formula": "xrank(csz_macd_5_21) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_spread_62ee3031b4",
+        "op": "rank_spread",
+        "left": "csz_macd_8_34",
+        "right": "csz_willr_4",
+        "formula": "xrank(csz_macd_8_34) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_spread_0e5c8c05b7",
+        "op": "z_spread",
+        "left": "macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xzscore(macd_5_21) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_add_090a1faeed",
+        "op": "z_add",
+        "left": "csz_macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xzscore(csz_macd_5_21) + xzscore(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_rank_add_01c4289c61",
+        "op": "rank_add",
+        "left": "csz_macd_5_21",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(csz_macd_5_21) + xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_gate_pos_b5a654a789",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "macd_3_13",
+        "formula": "xrank(csr_cpos) * I[xrank(macd_3_13) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_a120b8a737",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "macd_3_13",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(macd_3_13) > 0]"
+      },
+      {
+        "name": "nf_z_add_cf5bd7e7af",
+        "op": "z_add",
+        "left": "macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xzscore(macd_5_21) + xzscore(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_rank_add_bcc5324ebc",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_13",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_13) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_z_spread_781810127f",
+        "op": "z_spread",
+        "left": "tsz_macd_5_21",
+        "right": "csz_willr_6",
+        "formula": "xzscore(tsz_macd_5_21) - xzscore(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_gate_pos_a5215be9d7",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "csr_stoch_dev_21",
+        "formula": "xrank(macd_5_21) * I[xrank(csr_stoch_dev_21) > 0]"
+      },
+      {
+        "name": "nf_z_add_07eac11367",
+        "op": "z_add",
+        "left": "csr_stoch_dev_42",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(csr_stoch_dev_42) + xzscore(tsz_macd_3_13)"
+      }
+    ],
+    "removed_new_factor_expressions": [
+      {
+        "name": "nf_rank_gate_pos_ac57c12fc6",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(macd_3_13) * I[xrank(csr_stoch_dev_13) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_f9eb1f2c30",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "px_sma_4",
+        "formula": "xrank(macd_5_21) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_4b8df40e30",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "csz_px_sma_4",
+        "formula": "xrank(macd_3_13) * I[xrank(csz_px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_z_add_43e1ea889d",
+        "op": "z_add",
+        "left": "tsz_macd_5_21",
+        "right": "csz_stoch_dev_10",
+        "formula": "xzscore(tsz_macd_5_21) + xzscore(csz_stoch_dev_10)"
+      },
+      {
+        "name": "nf_z_spread_d6aced37bc",
+        "op": "z_spread",
+        "left": "csr_macd_10_42",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csr_macd_10_42) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_add_71a5d679aa",
+        "op": "rank_add",
+        "left": "macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xrank(macd_3_13) + xrank(macd_8_34)"
+      },
+      {
+        "name": "nf_z_add_3849925fc9",
+        "op": "z_add",
+        "left": "csz_macd_8_34",
+        "right": "macd_3_13",
+        "formula": "xzscore(csz_macd_8_34) + xzscore(macd_3_13)"
+      },
+      {
+        "name": "nf_z_spread_95a3cb4f50",
+        "op": "z_spread",
+        "left": "csz_macd_8_34",
+        "right": "csz_willr_4",
+        "formula": "xzscore(csz_macd_8_34) - xzscore(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_add_add804a7e9",
+        "op": "rank_add",
+        "left": "csr_macd_10_42",
+        "right": "csr_stoch_dev_16",
+        "formula": "xrank(csr_macd_10_42) + xrank(csr_stoch_dev_16)"
+      },
+      {
+        "name": "nf_rank_add_67caee5ce9",
+        "op": "rank_add",
+        "left": "csz_macd_8_34",
+        "right": "csz_macd_3_13",
+        "formula": "xrank(csz_macd_8_34) + xrank(csz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_spread_173cf99857",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_42",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_42) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_gate_pos_c97f31668d",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "px_sma_4",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_add_19f3f9dbf1",
+        "op": "rank_add",
+        "left": "macd_5_21",
+        "right": "csr_macd_10_42",
+        "formula": "xrank(macd_5_21) + xrank(csr_macd_10_42)"
+      },
+      {
+        "name": "nf_rank_add_29819b7cbc",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_34",
+        "right": "tsz_macd_3_13",
+        "formula": "xrank(csr_stoch_dev_34) + xrank(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_085ef6e1eb",
+        "op": "rank_add",
+        "left": "csz_macd_8_34",
+        "right": "macd_3_13",
+        "formula": "xrank(csz_macd_8_34) + xrank(macd_3_13)"
+      },
+      {
+        "name": "nf_z_add_a2a034a9d5",
+        "op": "z_add",
+        "left": "macd_8_34",
+        "right": "csr_stoch_dev_8",
+        "formula": "xzscore(macd_8_34) + xzscore(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_rank_gate_pos_35fb9006b1",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "csr_bollz_4",
+        "formula": "xrank(macd_5_21) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_9259c589dc",
+        "op": "rank_gate_pos",
+        "left": "csz_macd_3_13",
+        "right": "csz_px_sma_4",
+        "formula": "xrank(csz_macd_3_13) * I[xrank(csz_px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_add_94cd9febbc",
+        "op": "rank_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_34",
+        "formula": "xrank(macd_3_13) + xrank(csr_stoch_dev_34)"
+      },
+      {
+        "name": "nf_z_spread_07c39f2423",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "csr_stoch_dev_42",
+        "formula": "xzscore(csz_willr_4) - xzscore(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_rank_spread_c2e09c322a",
+        "op": "rank_spread",
+        "left": "csz_macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xrank(csz_macd_5_21) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_z_add_0b3287ba49",
+        "op": "z_add",
+        "left": "csz_macd_3_13",
+        "right": "csr_stoch_dev_21",
+        "formula": "xzscore(csz_macd_3_13) + xzscore(csr_stoch_dev_21)"
+      },
+      {
+        "name": "nf_z_add_86dacf33ab",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_21",
+        "formula": "xzscore(macd_3_13) + xzscore(csr_stoch_dev_21)"
+      },
+      {
+        "name": "nf_z_add_0706f2d8fb",
+        "op": "z_add",
+        "left": "csr_stoch_dev_42",
+        "right": "csr_bop",
+        "formula": "xzscore(csr_stoch_dev_42) + xzscore(csr_bop)"
+      },
+      {
+        "name": "nf_rank_add_d0b67c68df",
+        "op": "rank_add",
+        "left": "csz_macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xrank(csz_macd_3_13) + xrank(macd_8_34)"
+      },
+      {
+        "name": "nf_rank_add_3099b3b48f",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_42",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_42) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_rank_add_b2c19ed221",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_8",
+        "right": "csr_bop",
+        "formula": "xrank(csr_stoch_dev_8) + xrank(csr_bop)"
+      },
+      {
+        "name": "nf_rank_gate_pos_3ced7b81b0",
+        "op": "rank_gate_pos",
+        "left": "macd_5_21",
+        "right": "csr_stoch_dev_13",
+        "formula": "xrank(macd_5_21) * I[xrank(csr_stoch_dev_13) > 0]"
+      },
+      {
+        "name": "nf_rank_gate_pos_f947466566",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "csr_bollz_4",
+        "formula": "xrank(csr_cpos) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_spread_6308a27871",
+        "op": "rank_spread",
+        "left": "macd_8_34",
+        "right": "csz_willr_6",
+        "formula": "xrank(macd_8_34) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_add_5a6636b9ec",
+        "op": "rank_add",
+        "left": "csr_stoch_dev_8",
+        "right": "tsz_macd_3_13",
+        "formula": "xrank(csr_stoch_dev_8) + xrank(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_gate_pos_a0fe430550",
+        "op": "rank_gate_pos",
+        "left": "tsz_cpos",
+        "right": "csr_bollz_4",
+        "formula": "xrank(tsz_cpos) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_add_4264b5fb80",
+        "op": "rank_add",
+        "left": "csr_macd_10_42",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(csr_macd_10_42) + xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_spread_daedad3e47",
+        "op": "rank_spread",
+        "left": "csr_stoch_dev_8",
+        "right": "csz_willr_6",
+        "formula": "xrank(csr_stoch_dev_8) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_z_add_f2b251eeb3",
+        "op": "z_add",
+        "left": "macd_8_34",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(macd_8_34) + xzscore(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_548350e026",
+        "op": "rank_add",
+        "left": "macd_8_34",
+        "right": "csr_stoch_dev_8",
+        "formula": "xrank(macd_8_34) + xrank(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_rank_add_3ba60280d4",
+        "op": "rank_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_42",
+        "formula": "xrank(tsz_macd_5_21) + xrank(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_rank_spread_de575a94a5",
+        "op": "rank_spread",
+        "left": "macd_5_21",
+        "right": "csz_willr_4",
+        "formula": "xrank(macd_5_21) - xrank(csz_willr_4)"
+      },
+      {
+        "name": "nf_rank_spread_50c9b7021f",
+        "op": "rank_spread",
+        "left": "tsz_macd_5_21",
+        "right": "csz_willr_6",
+        "formula": "xrank(tsz_macd_5_21) - xrank(csz_willr_6)"
+      },
+      {
+        "name": "nf_rank_gate_pos_e8e1c36b9e",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "csz_px_sma_4",
+        "formula": "xrank(csr_cpos) * I[xrank(csz_px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_z_spread_ea28d46595",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "macd_8_34",
+        "formula": "xzscore(csz_willr_4) - xzscore(macd_8_34)"
+      },
+      {
+        "name": "nf_z_spread_ea3978810d",
+        "op": "z_spread",
+        "left": "csr_stoch_dev_42",
+        "right": "csz_willr_6",
+        "formula": "xzscore(csr_stoch_dev_42) - xzscore(csz_willr_6)"
+      },
+      {
+        "name": "nf_z_add_02a91a078d",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "csr_stoch_dev_34",
+        "formula": "xzscore(macd_3_13) + xzscore(csr_stoch_dev_34)"
+      },
+      {
+        "name": "nf_rank_spread_215bda2b86",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "csr_stoch_dev_16",
+        "formula": "xrank(csz_willr_4) - xrank(csr_stoch_dev_16)"
+      },
+      {
+        "name": "nf_z_add_8f52666950",
+        "op": "z_add",
+        "left": "csr_macd_10_42",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(csr_macd_10_42) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_z_spread_c2056e0361",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_3_13",
+        "formula": "xzscore(csz_willr_4) - xzscore(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_add_b049c36d1b",
+        "op": "rank_add",
+        "left": "macd_5_21",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(macd_5_21) + xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_z_spread_c042cedb83",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_5_21",
+        "formula": "xzscore(csz_willr_4) - xzscore(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_z_spread_2ea9a6c5b8",
+        "op": "z_spread",
+        "left": "px_sma_4",
+        "right": "csz_willr_6",
+        "formula": "xzscore(px_sma_4) - xzscore(csz_willr_6)"
+      },
+      {
+        "name": "nf_z_add_d4e2edc531",
+        "op": "z_add",
+        "left": "macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xzscore(macd_3_13) + xzscore(macd_8_34)"
+      },
+      {
+        "name": "nf_rank_spread_9d95136328",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "csr_stoch_dev_42",
+        "formula": "xrank(csz_willr_4) - xrank(csr_stoch_dev_42)"
+      },
+      {
+        "name": "nf_rank_gate_pos_5139583b64",
+        "op": "rank_gate_pos",
+        "left": "csr_cpos",
+        "right": "px_sma_4",
+        "formula": "xrank(csr_cpos) * I[xrank(px_sma_4) > 0]"
+      },
+      {
+        "name": "nf_rank_spread_90e6340a2a",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_5_21",
+        "formula": "xrank(csz_willr_4) - xrank(tsz_macd_5_21)"
+      },
+      {
+        "name": "nf_rank_add_b4fdecde2a",
+        "op": "rank_add",
+        "left": "tsz_macd_5_21",
+        "right": "csr_stoch_dev_8",
+        "formula": "xrank(tsz_macd_5_21) + xrank(csr_stoch_dev_8)"
+      },
+      {
+        "name": "nf_rank_spread_1ac56d174c",
+        "op": "rank_spread",
+        "left": "csz_willr_4",
+        "right": "tsz_macd_3_13",
+        "formula": "xrank(csz_willr_4) - xrank(tsz_macd_3_13)"
+      },
+      {
+        "name": "nf_rank_gate_pos_27438f62dc",
+        "op": "rank_gate_pos",
+        "left": "macd_3_13",
+        "right": "csr_bollz_4",
+        "formula": "xrank(macd_3_13) * I[xrank(csr_bollz_4) > 0]"
+      },
+      {
+        "name": "nf_rank_add_ef81c42a10",
+        "op": "rank_add",
+        "left": "tsz_macd_5_21",
+        "right": "csz_stoch_dev_10",
+        "formula": "xrank(tsz_macd_5_21) + xrank(csz_stoch_dev_10)"
+      },
+      {
+        "name": "nf_z_add_fc497e73fd",
+        "op": "z_add",
+        "left": "macd_5_21",
+        "right": "csr_stoch_dev_13",
+        "formula": "xzscore(macd_5_21) + xzscore(csr_stoch_dev_13)"
+      },
+      {
+        "name": "nf_z_spread_1b4611bb13",
+        "op": "z_spread",
+        "left": "csz_willr_4",
+        "right": "px_sma_4",
+        "formula": "xzscore(csz_willr_4) - xzscore(px_sma_4)"
+      },
+      {
+        "name": "nf_z_add_4b099779c4",
+        "op": "z_add",
+        "left": "csz_macd_3_13",
+        "right": "macd_8_34",
+        "formula": "xzscore(csz_macd_3_13) + xzscore(macd_8_34)"
+      }
+    ]
+  },
+  "overlap": {
+    "ridge_lightgbm_retained_new_factor_count": 14,
+    "ridge_lightgbm_retained_new_factor_names": [
+      "nf_rank_add_01c4289c61",
+      "nf_rank_add_9767512bcc",
+      "nf_rank_add_bcc5324ebc",
+      "nf_rank_gate_pos_2a676e57ff",
+      "nf_rank_gate_pos_a5215be9d7",
+      "nf_rank_gate_pos_b5a654a789",
+      "nf_rank_spread_9c8b11710d",
+      "nf_z_add_07eac11367",
+      "nf_z_add_090a1faeed",
+      "nf_z_add_4adcb06b2f",
+      "nf_z_add_7103ccc366",
+      "nf_z_add_cbc13c4adc",
+      "nf_z_add_cf5bd7e7af",
+      "nf_z_spread_781810127f"
+    ]
+  }
+}

@@ -87,19 +87,41 @@ def load_train_sample(cfg, features: list[str], sample_dir: Path) -> pd.DataFram
     return pd.concat(frames, ignore_index=True)
 
 
-def load_eval_month(cfg, month: str, features: list[str]) -> tuple[pd.DataFrame, np.ndarray, list[tuple[int, int]]]:
-    df = FeatureMatrix(cfg).read_month(month, features)
+def resolve_output_path(cfg, value: str | None) -> Path | None:
+    if value is None:
+        return None
+    path = Path(value)
+    if not path.is_absolute():
+        path = cfg.output_dir / path
+    return path
+
+
+def load_eval_month(
+    cfg,
+    month: str,
+    features: list[str],
+    expression_path: Path | None,
+) -> tuple[pd.DataFrame, np.ndarray, list[tuple[int, int]]]:
+    df = FeatureMatrix(cfg, expression_path).read_month(month, features)
     df = df.sort_values(["datetime", "symbol"]).reset_index(drop=True)
     label = df["label"].to_numpy(np.float64, copy=False)
     bounds = group_bounds(df["datetime"])
     return df, label, bounds
 
 
-def new_factor_set(cfg) -> set[str]:
-    path = cfg.output_dir / "expression_sets" / "new100.csv"
+def new_factor_set(cfg, path_arg: str | None) -> set[str]:
+    path = resolve_output_path(cfg, path_arg) if path_arg else cfg.output_dir / "expression_sets" / "new100.csv"
     if not path.exists():
         return set()
     return set(pd.read_csv(path)["name"].tolist())
+
+
+def target_factor_indices(features: list[str], path_arg: str | None) -> list[int]:
+    if not path_arg:
+        return list(range(len(features)))
+    target_path = Path(path_arg)
+    target = set(read_feature_list(target_path))
+    return [idx for idx, name in enumerate(features) if name in target]
 
 
 def run_ridge(args) -> None:
@@ -108,11 +130,14 @@ def run_ridge(args) -> None:
     if not feature_file.is_absolute():
         feature_file = cfg.output_dir / feature_file
     features = read_feature_list(feature_file)
-    new_names = new_factor_set(cfg)
+    new_names = new_factor_set(cfg, args.new_factor_file)
+    target_indices = target_factor_indices(features, args.target_factor_file)
+    expression_path = resolve_output_path(cfg, args.expression_file)
 
     out_dir = cfg.reports_dir / "effectiveness_validation"
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_file = out_dir / f"ridge_leave_one_{args.month}.csv"
+    tag = f"_{args.tag}" if args.tag else ""
+    out_file = out_dir / f"ridge_leave_one_{args.month}{tag}.csv"
     if out_file.exists() and not args.force:
         print(f"[ridge-validate] exists {out_file}")
         return
@@ -144,7 +169,7 @@ def run_ridge(args) -> None:
     del gram, k_mat, cov
     gc.collect()
 
-    eval_df, label, bounds = load_eval_month(cfg, args.month, features)
+    eval_df, label, bounds = load_eval_month(cfg, args.month, features, expression_path)
     x_eval = scrub_matrix(eval_df[features].to_numpy(np.float32, copy=False))
     xz_eval = ((x_eval - mean) / scale).astype(np.float32)
     del x_eval, eval_df
@@ -155,9 +180,9 @@ def run_ridge(args) -> None:
     print(f"[ridge-validate] base pred_xsz_ic={base_ic:.8f}", flush=True)
 
     rows = []
-    for start in range(0, len(features), args.block_size):
-        end = min(start + args.block_size, len(features))
-        idx = np.arange(start, end)
+    for start in range(0, len(target_indices), args.block_size):
+        end = min(start + args.block_size, len(target_indices))
+        idx = np.asarray(target_indices[start:end], dtype=np.int64)
         h = xz_eval @ k_inv[:, idx]
         adjust = weight[idx] / diag[idx]
         drop_preds = full_pred[:, None] - h * adjust[None, :]
@@ -177,19 +202,20 @@ def run_ridge(args) -> None:
                     "month": args.month,
                 }
             )
-        print(f"[ridge-validate] evaluated {end}/{len(features)}", flush=True)
+        print(f"[ridge-validate] evaluated {end}/{len(target_indices)}", flush=True)
 
     result = pd.DataFrame(rows).sort_values("delta_ic", ascending=False)
     result.to_csv(out_file, index=False)
     retained = result[result["retained"]]["factor"].tolist()
     removed = result[~result["retained"]]["factor"].tolist()
-    write_feature_list(out_dir / f"ridge_retained_{args.month}.txt", retained)
-    write_feature_list(out_dir / f"ridge_removed_{args.month}.txt", removed)
+    write_feature_list(out_dir / f"ridge_retained_{args.month}{tag}.txt", retained)
+    write_feature_list(out_dir / f"ridge_removed_{args.month}{tag}.txt", removed)
     summary = {
         "model": "ridge",
         "month": args.month,
         "base_ic": base_ic,
         "features": len(features),
+        "target_features": len(target_indices),
         "retained": len(retained),
         "removed": len(removed),
         "new_factor_pool": len(new_names),
@@ -197,7 +223,7 @@ def run_ridge(args) -> None:
         "removed_new_factors": int(result[~result["retained"]]["is_new_factor"].sum()),
         "tolerance": args.tolerance,
     }
-    (out_dir / f"ridge_leave_one_{args.month}_summary.json").write_text(
+    (out_dir / f"ridge_leave_one_{args.month}{tag}_summary.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
@@ -219,15 +245,17 @@ def run_lgbm(args) -> None:
     if not feature_file.is_absolute():
         feature_file = cfg.output_dir / feature_file
     features = read_feature_list(feature_file)
-    new_names = new_factor_set(cfg)
+    new_names = new_factor_set(cfg, args.new_factor_file)
+    expression_path = resolve_output_path(cfg, args.expression_file)
 
     out_dir = cfg.reports_dir / "effectiveness_validation"
     out_dir.mkdir(parents=True, exist_ok=True)
+    tag = f"_{args.tag}" if args.tag else ""
     shard_suffix = ""
     if args.num_shards > 1:
         shard_suffix = f"_shard{args.shard_index:02d}of{args.num_shards:02d}"
-    out_file = out_dir / f"lgbm_shuffle_{args.month}{shard_suffix}.csv"
-    partial_file = out_dir / f"lgbm_shuffle_{args.month}{shard_suffix}.partial.csv"
+    out_file = out_dir / f"lgbm_shuffle_{args.month}{tag}{shard_suffix}.csv"
+    partial_file = out_dir / f"lgbm_shuffle_{args.month}{tag}{shard_suffix}.partial.csv"
     if out_file.exists() and not args.force:
         print(f"[lgbm-validate] exists {out_file}")
         return
@@ -239,7 +267,7 @@ def run_lgbm(args) -> None:
     split = booster.feature_importance("split")
     gain = booster.feature_importance("gain")
 
-    eval_df, label, bounds = load_eval_month(cfg, args.month, features)
+    eval_df, label, bounds = load_eval_month(cfg, args.month, features, expression_path)
     x_eval = scrub_matrix(eval_df[features].to_numpy(np.float32, copy=False))
     del eval_df
     gc.collect()
@@ -263,8 +291,9 @@ def run_lgbm(args) -> None:
     rng = np.random.default_rng(args.seed)
     normal_cache: dict[int, np.ndarray] = {}
 
+    base_target_indices = target_factor_indices(features, args.target_factor_file)
     target_indices = [
-        idx for idx in range(len(features)) if args.num_shards <= 1 or idx % args.num_shards == args.shard_index
+        idx for idx in base_target_indices if args.num_shards <= 1 or idx % args.num_shards == args.shard_index
     ]
     if args.max_features:
         target_indices = target_indices[: args.max_features]
@@ -318,8 +347,8 @@ def run_lgbm(args) -> None:
     pd.DataFrame(rows).to_csv(partial_file, index=False)
     retained_factors = result[result["retained"]]["factor"].tolist()
     removed_factors = result[~result["retained"]]["factor"].tolist()
-    write_feature_list(out_dir / f"lgbm_retained_{args.month}.txt", retained_factors)
-    write_feature_list(out_dir / f"lgbm_removed_{args.month}.txt", removed_factors)
+    write_feature_list(out_dir / f"lgbm_retained_{args.month}{tag}{shard_suffix}.txt", retained_factors)
+    write_feature_list(out_dir / f"lgbm_removed_{args.month}{tag}{shard_suffix}.txt", removed_factors)
     summary = {
         "model": "lightgbm",
         "month": args.month,
@@ -338,7 +367,7 @@ def run_lgbm(args) -> None:
         "shard_index": args.shard_index,
         "num_shards": args.num_shards,
     }
-    (out_dir / f"lgbm_shuffle_{args.month}_summary.json").write_text(
+    (out_dir / f"lgbm_shuffle_{args.month}{tag}{shard_suffix}_summary.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
@@ -351,6 +380,10 @@ def main() -> None:
     parser.add_argument("--mode", choices=["ridge", "lgbm"], required=True)
     parser.add_argument("--month", default="2020-01")
     parser.add_argument("--feature-file", default="model_feature_sets/new_all1244.txt")
+    parser.add_argument("--expression-file", default=None)
+    parser.add_argument("--new-factor-file", default=None)
+    parser.add_argument("--target-factor-file", default=None)
+    parser.add_argument("--tag", default="")
     parser.add_argument("--tolerance", type=float, default=0.0)
     parser.add_argument("--force", action="store_true")
 

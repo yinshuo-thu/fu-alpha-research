@@ -75,13 +75,44 @@ using 2020-01 as the validation month:
 | Ridge | exact leave-one-factor-out retrain; remove if IC does not decline | 617 / 1244 | 51 / 100 |
 | LightGBM | single-factor standard-normal replacement; remove if IC does not decline | 643 / 1244 | 46 / 100 |
 
-The overlap between Ridge-retained and LightGBM-retained new factors is 26. This
-gives independent model-specific evidence that the mined expression factors are
-not merely duplicates of the original pool. The full reports are:
+Second-round skill optimization: using the expanded multi-layer mining skill,
+another 100 formula factors were generated from the remaining candidate pool and
+tested only as incremental additions to the already validated model sets. Ridge
+started from its 617 retained factors; LightGBM started from its 643 retained
+factors. After model-specific validation on 2020-01, the retained new factors
+were added back, models were retrained on 2018-2019, and 2020 full-year OOS IC
+was recomputed.
+
+| Model | Validation base | Test | Effective from new100 | Final factors | Base 2020 OOS IC | +100 candidate IC | +effective-new IC | Delta vs base | Delta vs +100 |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Ridge | 617 | exact leave-one-factor-out retrain | 42 / 100 | 659 | 0.041014 | 0.041064 | 0.041071 | +0.000056 | +0.000006 |
+| LightGBM | 643 | single-factor standard-normal replacement | 40 / 100 | 683 | 0.025216 | 0.025852 | 0.026121 | +0.000905 | +0.000269 |
+
+The second round therefore adds positive full-year 2020 OOS IC after validation:
+Ridge improves by 0.000056 IC over the 617-factor base, and LightGBM improves by
+0.000905 IC over the 643-factor base. The filtered LightGBM set also beats
+directly adding all 100 candidates by 0.000269 IC, showing that the shuffle-based
+incremental filter removed harmful or redundant candidates. Ridge and LightGBM
+jointly retained 14 of the second-round new factors. The compact round-two
+factor summary, including the 100 generated formulas and the model-specific
+retained/removed lists, is committed at
+`references/futures/round2_effective_factors_summary.json`; the local generated
+expression and feature-set artifacts are:
+
+- `outputs/expression_sets/new100_round2.csv`
+- `outputs/expression_sets/new200.csv`
+- `outputs/model_feature_sets/ridge617_plus_round2_retained42.txt`
+- `outputs/model_feature_sets/lgbm643_plus_round2_retained40.txt`
+
+For the first 100-factor round, the overlap between Ridge-retained and
+LightGBM-retained new factors was 26. These model-specific validations give
+independent evidence that the mined expression factors are not merely duplicates
+of the original pool. The full reports are:
 
 - `reports/final_factor_mining_report.md`
 - `reports/factor_effectiveness_validation.md`
 - `references/futures/old_effective_factors_summary.json`
+- `references/futures/round2_effective_factors_summary.json`
 
 ## Quick Start
 
@@ -128,6 +159,8 @@ directory contains only small metadata:
 
 - `selected_factors.txt`
 - `factor_catalog.csv`
+- `old_effective_factors_summary.json`
+- `round2_effective_factors_summary.json`
 
 Do not commit `/root/autodl-tmp/quant/data/raw`, `selected_month_parts`,
 `data_factors_big.parquet`, or prediction parquet files.
