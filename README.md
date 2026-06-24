@@ -24,6 +24,9 @@ The project is designed for the AutoDL workspace layout:
 - Baselines: Ridge and LightGBM.
 - Factor mining: IS/OOS single-factor IC with same-sign effective-factor filter.
 - Backtest: simple timestamp-level long-short spread on prediction ranks.
+- Factor acceptance now follows the multi-layer framework in
+  `docs/factor_evaluation_framework.md`, covering data quality, IC, bucket,
+  regime, trading simulation, incremental value, robustness, and A-E decisions.
 
 ## Validation Evidence
 
