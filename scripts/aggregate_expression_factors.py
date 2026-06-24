@@ -53,12 +53,18 @@ def main() -> None:
     expr_dir.mkdir(parents=True, exist_ok=True)
     selected[["name", "op", "left", "right", "formula"]].to_csv(expr_dir / "new100.csv", index=False)
     summary = {
+        "method": "ic_prefilter_legacy_not_final_acceptance",
         "candidates": int(len(out)),
         "effective": int(out["effective"].sum()),
-        "selected": int(len(selected)),
+        "legacy_selected": int(len(selected)),
         "min_is_ic": args.min_is_ic,
         "min_oos_ic": args.min_oos_ic,
         "top_oos_ic": float(selected["oos_ic"].abs().max()) if len(selected) else math.nan,
+        "note": (
+            "This is only a fast IC prefilter. Final new-factor acceptance should be produced by "
+            "scripts/evaluate_expression_scorecard.py, which adds data-quality, bucket, regime, "
+            "correlation, trading, and robustness gates."
+        ),
     }
     (cfg.reports_dir / "new_factor_mining_summary.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False) + "\n",

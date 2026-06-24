@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -57,6 +58,49 @@ def _dedup_pairs(pairs: list[tuple[str, str]]) -> list[tuple[str, str]]:
     return out
 
 
+def _seed_group(row: pd.Series) -> str:
+    family = str(row.get("family", "") or "")
+    view = str(row.get("view", "") or "")
+    if family or view:
+        return f"{family}:{view}"
+    name = str(row.get("factor", "") or "")
+    for prefix in ("tsz_", "csz_", "csr_"):
+        if name.startswith(prefix):
+            return prefix.rstrip("_")
+    return "raw"
+
+
+def _select_diverse_seeds(scores: pd.DataFrame, max_seeds: int) -> pd.DataFrame:
+    """Select seeds by strength, then diversify by catalog family/view.
+
+    This avoids building every expression from a small cluster of highly similar
+    legacy factors. The cap relaxes gradually until the requested seed count is
+    reached, which makes the process deterministic and open-ended for continuous
+    mining rounds.
+    """
+    if scores.empty or max_seeds <= 0:
+        return scores.iloc[0:0].copy()
+    scores = scores.copy()
+    scores["_seed_group"] = scores.apply(_seed_group, axis=1)
+    selected_idx: list[int] = []
+    selected_set: set[int] = set()
+    counts: Counter[str] = Counter()
+    max_cap = max(2, max_seeds)
+    for cap in range(1, max_cap + 1):
+        for idx, row in scores.iterrows():
+            if idx in selected_set:
+                continue
+            group = str(row["_seed_group"])
+            if counts[group] >= cap:
+                continue
+            selected_idx.append(idx)
+            selected_set.add(idx)
+            counts[group] += 1
+            if len(selected_idx) >= max_seeds:
+                return scores.loc[selected_idx].drop(columns="_seed_group")
+    return scores.loc[selected_idx].drop(columns="_seed_group")
+
+
 def generate_candidate_expressions(
     factor_scores: pd.DataFrame,
     max_seeds: int = 80,
@@ -73,7 +117,7 @@ def generate_candidate_expressions(
         scores["abs_is_ic"] = scores["is_ic"].abs()
     scores["same_sign"] = np.sign(scores["is_ic"]) == np.sign(scores["oos_ic"])
     scores = scores.sort_values(["same_sign", "abs_is_ic"], ascending=[False, False]).reset_index(drop=True)
-    seeds = scores.head(max_seeds).copy()
+    seeds = _select_diverse_seeds(scores, max_seeds)
     names = seeds["factor"].tolist()
 
     pairs: list[tuple[str, str]] = []
@@ -86,7 +130,7 @@ def generate_candidate_expressions(
                 break
         if len(pairs) >= max_pairs:
             break
-        # Add a deterministic cross-family pairing from deeper seeds.
+        # Add deterministic cross-family/view pairings from deeper seeds.
         for j in range(len(names) - 1, max(i, len(names) - 20), -1):
             right_row = seeds.iloc[j]
             if left_row.get("family") != right_row.get("family") or left_row.get("view") != right_row.get("view"):

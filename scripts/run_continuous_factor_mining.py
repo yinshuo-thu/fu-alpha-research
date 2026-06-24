@@ -24,6 +24,9 @@ def main() -> None:
     parser.add_argument("--seed-step", type=int, default=20)
     parser.add_argument("--pair-step", type=int, default=250)
     parser.add_argument("--block-size", type=int, default=80)
+    parser.add_argument("--scorecard-rows-per-month", type=int, default=3000)
+    parser.add_argument("--max-corr", type=float, default=0.90)
+    parser.add_argument("--selection-pool", type=int, default=800)
     args = parser.parse_args()
 
     cfg = load_config(args.config)
@@ -91,7 +94,23 @@ def main() -> None:
                 str(args.target),
             ]
         )
-        selected = pd.read_csv(cfg.reports_dir / "new_effective_factors_100.csv")
+        run(
+            [
+                sys.executable,
+                "scripts/evaluate_expression_scorecard.py",
+                "--config",
+                args.config,
+                "--target",
+                str(args.target),
+                "--rows-per-month",
+                str(args.scorecard_rows_per_month),
+                "--max-corr",
+                str(args.max_corr),
+                "--selection-pool",
+                str(args.selection_pool),
+            ]
+        )
+        selected = pd.read_csv(cfg.reports_dir / "new_effective_factors_scorecard.csv")
         if len(selected) >= args.target:
             print(f"[continuous-mining] target reached selected={len(selected)}", flush=True)
             return

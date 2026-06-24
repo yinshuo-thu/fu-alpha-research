@@ -13,8 +13,8 @@ mining project with a reproducible IS/OOS protocol:
 
 ## Factor Storage
 
-The repository stores only metadata for 1,144 selected factors. Large data is
-external. The loader supports two storage modes:
+The repository stores only metadata for the existing local factor library.
+Large data is external. The loader supports two storage modes:
 
 - `final_panel`: read `data_factors_big.parquet` directly when it exists.
 - `month_partitions`: read intermediate `month=YYYY-MM/*.parquet` partitions
@@ -38,13 +38,20 @@ the 30-bar labels.
 
 ## Effective Factors
 
-Single-factor mining computes IS and OOS IC for all selected factors. A factor
-is effective when:
+Fast single-factor mining computes IS and OOS IC for the existing factor
+library, but this is only a prefilter. A candidate is not effective until it
+passes the scorecard and model-incremental checks described in
+`docs/factor_evaluation_framework.md`.
 
-- `abs(IS IC)` passes the configured threshold;
-- `abs(OOS IC)` passes the configured threshold;
-- IS and OOS IC signs agree;
-- coverage is broad enough in both windows.
+The scorecard includes:
 
-The generated `reports/generated/effective_factors.csv` is excluded from git
-but can be regenerated from the local factor panel.
+- data quality and coverage;
+- Pearson/rank IC and monthly stability;
+- product, liquidity, and volatility regimes;
+- bucket monotonicity and top-bottom spread;
+- turnover/cost proxies;
+- max correlation to the existing library and selected peers;
+- residualized IC and model-incremental validation.
+
+Generated reports under `reports/generated/` are excluded from git but can be
+regenerated from the local factor panel.

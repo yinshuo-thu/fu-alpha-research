@@ -32,6 +32,35 @@ Each candidate must store:
 - intended intuition;
 - creation timestamp or generation round.
 
+Continuous mining should maintain an accepted pool and a rejected ledger. The
+accepted pool is used for low-correlation checks and family/operator diversity;
+the rejected ledger prevents repeating candidates that failed data quality,
+leakage, correlation, or robustness gates. OOS labels are for reporting and
+final evidence, not for repeatedly tuning candidate formulas.
+
+The current command-level implementation is:
+
+```bash
+PYTHONPATH=src python scripts/run_continuous_factor_mining.py --config configs/futures.yaml --target 100
+```
+
+The detailed evaluator can also be run directly:
+
+```bash
+PYTHONPATH=src python scripts/evaluate_expression_scorecard.py \
+  --config configs/futures.yaml \
+  --target 100 \
+  --rows-per-month 3000 \
+  --max-corr 0.90
+```
+
+This script writes:
+
+- `reports/generated/new_factor_scorecard.csv`
+- `reports/generated/new_effective_factors_scorecard.csv`
+- `reports/generated/new_factor_scorecard_summary.json`
+- `outputs/expression_sets/new100.csv`
+
 ## Step 1: Data Quality Check
 
 Required checks:
@@ -158,6 +187,7 @@ Standalone quality is not enough. Check incremental value.
 Required metrics:
 
 - correlation with existing factor library;
+- correlation with already selected candidates in the same mining round;
 - cluster/family assignment;
 - residualized IC after regressing on existing factors or family components;
 - baseline model versus baseline plus candidate;
@@ -166,6 +196,8 @@ Required metrics:
 
 Suggested gates:
 
+- max absolute correlation should normally be <= 0.90 against the existing
+  library and selected peers;
 - high correlation requires residualized IC or model lift evidence;
 - a factor with weak standalone IC can be B if it improves OOS model IC;
 - a factor with high standalone IC can still be rejected if it is redundant.
@@ -181,6 +213,7 @@ Required checks:
 - multiple-testing penalty;
 - sensitivity to winsorization, standardization, and universe filters;
 - reproducible command log and artifact paths.
+- clear separation of discovery metrics and OOS report metrics.
 
 Suggested gates:
 
@@ -213,6 +246,9 @@ regime_score
 trading_score
 incremental_score
 robustness_score
+max_abs_corr_to_library
+candidate_peer_max_abs_corr
+residual_ic
 audit_penalty
 final_grade
 decision_reason
@@ -222,6 +258,10 @@ The final grade is not a simple average. Leakage or severe data-quality failure
 overrides every positive performance metric. Trading-cost failure prevents A but
 does not necessarily prevent B. Narrow regime dependence should become C, not
 A.
+
+Fast same-sign IS/OOS IC screens are allowed only as prefilters. They should not
+write the final accepted list unless followed by the scorecard and low-correlation
+selection stages.
 
 ## Minimum Artifacts
 

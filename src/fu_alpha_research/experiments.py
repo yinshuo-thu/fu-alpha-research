@@ -181,12 +181,13 @@ def write_markdown_report(cfg: Config) -> Path:
     if mining_path.exists():
         mining = json.loads(mining_path.read_text(encoding="utf-8"))
         lines += [
-            "## Factor Mining",
+            "## Existing-Library IC Prefilter",
             "",
             f"- Effective factors: {mining.get('effective_factors')} / {mining.get('total_factors')}.",
             f"- Thresholds: abs(IS IC) >= {mining.get('min_is_ic')}, "
             f"abs(OOS IC) >= {mining.get('min_oos_ic')}, same sign.",
-            f"- Top names: {', '.join(mining.get('top_effective', [])[:10])}.",
+            "- This is a fast prefilter, not the final new-expression acceptance rule.",
+            f"- Top prefilter names: {', '.join(mining.get('top_effective', [])[:10])}.",
             "",
         ]
     for path in baseline_files:

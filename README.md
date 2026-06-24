@@ -1,7 +1,7 @@
 # FU Alpha Research
 
-Local China futures alpha mining migrated from the lightweight
-`wq-alpha-research` playbook into a runnable futures research project.
+Local China futures alpha mining, factor validation, and model-feature research
+project.
 
 The project is designed for the AutoDL workspace layout:
 
@@ -16,13 +16,14 @@ The project is designed for the AutoDL workspace layout:
 
 - 51 China futures, excluding financial futures by default.
 - 30-bar forward return label.
-- 1,144 selected factors:
-  402 raw, 164 time-series z-score, 299 cross-sectional z-score, and
-  279 cross-sectional rank factors.
+- A local library of existing futures factors, including price-volume,
+  technical, time-series normalized, and cross-sectional normalized views. The
+  exact catalog lives in `references/futures/factor_catalog.csv`.
 - In-sample window defaults to 2018-2019.
 - OOS window defaults to 2020.
 - Baselines: Ridge and LightGBM.
-- Factor mining: IS/OOS single-factor IC with same-sign effective-factor filter.
+- Factor mining: dynamic expression generation plus a multi-layer scorecard.
+  Full acceptance is not based on full-sample IC or a single backtest.
 - Backtest: simple timestamp-level long-short spread on prediction ranks.
 - Factor acceptance now follows the multi-layer framework in
   `docs/factor_evaluation_framework.md`, covering data quality, IC, bucket,
@@ -30,13 +31,36 @@ The project is designed for the AutoDL workspace layout:
 
 ## Validation Evidence
 
-The migrated project has been run end-to-end on the local futures panel with
-2018-2019 as in-sample data and 2020 as OOS data.
+The project has been run end-to-end on the local futures panel with 2018-2019
+as in-sample data and 2020 as OOS data.
 
-Expression mining generated 4,000 new formula candidates. Under the same-sign
-IS/OOS IC screen (`abs(IS IC) >= 0.002`, `abs(OOS IC) >= 0.001`, coverage proxy
->= 0.5), 2,535 candidates passed and the top 100 were selected as new effective
-factors.
+Earlier experiments used a fast same-sign IS/OOS IC screen as a candidate
+prefilter. That screen is now treated only as a cheap triage stage. New factors
+must pass the scorecard workflow before they can be called effective: data
+quality, Pearson and rank IC, daily/monthly stability, product-level IC, bucket
+monotonicity, top-bottom spread, liquidity/volatility regimes, turnover/cost
+proxies, correlation with the existing library, residualized IC, and model
+incremental tests.
+
+The current mining skill is designed as a continuous loop:
+
+1. Generate auditable expression candidates from a diversified seed pool rather
+   than only the strongest IC seeds.
+2. Aggregate cheap IC parts to remove obvious failures.
+3. Run `scripts/evaluate_expression_scorecard.py` on the remaining candidates.
+   This computes bucket, product, regime, turnover, library-correlation, and
+   residual-IC diagnostics.
+4. Enforce low-correlation gates: a candidate should have max absolute
+   correlation <= 0.90 against the existing library, unless its residualized IC
+   still justifies keeping it as a model feature.
+5. Select candidates greedily with family/operator diversity and candidate-peer
+   correlation checks, then write `outputs/expression_sets/new100.csv`.
+6. Validate selected factors inside Ridge and LightGBM with leave-one-factor-out
+   or shuffle tests before reporting model IC lift.
+
+This design borrows the useful v3 idea of a persistent accepted pool,
+low-correlation gating, train-only discovery, OOS reporting, and full audit logs,
+but adapts it to this futures factor panel and local Ridge/LightGBM workflow.
 
 Model comparison on 2020 OOS, using `pred_xsz` IC:
 
@@ -119,10 +143,27 @@ of the original pool. The full reports are:
 ```bash
 cd /root/autodl-tmp/fu-alpha-research
 PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml audit-data
+# Existing-library IC prefilter, not final new-expression acceptance.
 PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml mine-factors
 PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml baseline --models ridge,lightgbm
 PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml incremental --sets 100,300,all
 PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml report
+```
+
+For the current scorecard-based expression mining loop:
+
+```bash
+PYTHONPATH=src python scripts/run_continuous_factor_mining.py --config configs/futures.yaml --target 100
+```
+
+Or run the detailed scorecard directly after generating candidates and IC parts:
+
+```bash
+PYTHONPATH=src python scripts/evaluate_expression_scorecard.py \
+  --config configs/futures.yaml \
+  --target 100 \
+  --rows-per-month 3000 \
+  --max-corr 0.90
 ```
 
 The same CLI is exposed as `fu-alpha` after installing the package:
@@ -134,9 +175,9 @@ fu-alpha --config configs/futures.yaml run-all
 
 ## Rebuild Factors
 
-If the final panel is missing, the loader can materialize 1,144 factors on the
-fly from intermediate month partitions. To rebuild those partitions from raw
-CSV files:
+If the final panel is missing, the loader can materialize the existing factor
+library on the fly from intermediate month partitions. To rebuild those
+partitions from raw CSV files:
 
 ```bash
 PYTHONPATH=src python -m fu_alpha_research.cli --config configs/futures.yaml \
