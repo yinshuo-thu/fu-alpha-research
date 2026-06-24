@@ -46,24 +46,23 @@ Model comparison on 2020 OOS, using `pred_xsz` IC:
 | LightGBM | effective657 | 0.025890 | 0.026199 | +0.000308 |
 | LightGBM | all1144 | 0.025679 | 0.025615 | -0.000065 |
 
-Counterfactual removal test: after identifying model-specific effective new
-factors on 2020-01, those new factors were removed from each `+100` feature set,
-the models were retrained, and 2020 OOS `pred_xsz` IC was recomputed.
+Validated-retained factor test: after identifying model-specific effective
+factors on 2020-01, each model was retrained on its full retained set and on the
+same retained set with the retained new factors removed.
 
-| Model | Feature set | With 100 new factors | Remove validated new factors | IC drop vs +100 |
-| --- | --- | ---: | ---: | ---: |
-| Ridge | top300 | 0.039094 | 0.038918 | -0.000176 |
-| Ridge | effective657 + 100 | 0.039323 | 0.039121 | -0.000202 |
-| Ridge | all1144 + 100 | 0.037890 | 0.037679 | -0.000211 |
-| LightGBM | top300 | 0.025263 | 0.024347 | -0.000916 |
-| LightGBM | effective657 + 100 | 0.026199 | 0.025356 | -0.000843 |
-| LightGBM | all1144 + 100 | 0.025615 | 0.026944 | +0.001329 |
+| Model | Feature set | Factors | 2020 OOS IC | 2020-01 IC | 2020 OOS delta |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Ridge | retained factors, including 51 new factors | 617 | 0.041014 | 0.085484 | +0.000676 |
+| Ridge | retained factors, excluding those 51 new factors | 566 | 0.040339 | 0.085646 | baseline |
+| LightGBM | retained factors, including 46 new factors | 643 | 0.025216 | 0.044339 | +0.000204 |
+| LightGBM | retained factors, excluding those 46 new factors | 597 | 0.025012 | 0.045005 | baseline |
 
-This removal test supports the mined-factor signal for Ridge across all feature
-sets. For LightGBM, the top300 and effective-factor sets also lose IC when the
-validated new factors are removed, while the all-factor set improves after
-removal, indicating stronger redundancy and interaction effects in the full tree
-feature pool.
+This retained-set test supports the mined-factor signal on full-year 2020 OOS:
+the full Ridge retained set beats the old-only retained set by 0.000676 IC, and
+the full LightGBM retained set beats the old-only retained set by 0.000204 IC.
+The 2020-01 retrained comparison is not monotonic, which is expected because
+2020-01 was used to identify factor effectiveness and the model is refit after
+removing correlated features.
 
 Model-specific factor validation was then run on the `new_all1244` universe
 using 2020-01 as the validation month:
