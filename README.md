@@ -46,6 +46,25 @@ Model comparison on 2020 OOS, using `pred_xsz` IC:
 | LightGBM | effective657 | 0.025890 | 0.026199 | +0.000308 |
 | LightGBM | all1144 | 0.025679 | 0.025615 | -0.000065 |
 
+Counterfactual removal test: after identifying model-specific effective new
+factors on 2020-01, those new factors were removed from each `+100` feature set,
+the models were retrained, and 2020 OOS `pred_xsz` IC was recomputed.
+
+| Model | Feature set | With 100 new factors | Remove validated new factors | IC drop vs +100 |
+| --- | --- | ---: | ---: | ---: |
+| Ridge | top300 | 0.039094 | 0.038918 | -0.000176 |
+| Ridge | effective657 + 100 | 0.039323 | 0.039121 | -0.000202 |
+| Ridge | all1144 + 100 | 0.037890 | 0.037679 | -0.000211 |
+| LightGBM | top300 | 0.025263 | 0.024347 | -0.000916 |
+| LightGBM | effective657 + 100 | 0.026199 | 0.025356 | -0.000843 |
+| LightGBM | all1144 + 100 | 0.025615 | 0.026944 | +0.001329 |
+
+This removal test supports the mined-factor signal for Ridge across all feature
+sets. For LightGBM, the top300 and effective-factor sets also lose IC when the
+validated new factors are removed, while the all-factor set improves after
+removal, indicating stronger redundancy and interaction effects in the full tree
+feature pool.
+
 Model-specific factor validation was then run on the `new_all1244` universe
 using 2020-01 as the validation month:
 
