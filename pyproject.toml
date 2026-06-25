@@ -15,6 +15,7 @@ dependencies = [
   "scikit-learn",
   "lightgbm",
   "scipy",
+  "torch",
 ]
 
 [project.scripts]

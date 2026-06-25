@@ -193,12 +193,28 @@ def xzscore_frame(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     return pd.DataFrame(out, index=df.index)
 
 
-def compute_expression_block(base: pd.DataFrame, exprs: pd.DataFrame) -> pd.DataFrame:
+def precompute_expression_inputs(base: pd.DataFrame, exprs: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     inputs = sorted(set(exprs["left"]).union(exprs["right"]))
-    ranks = xrank_frame(base, inputs)
-    zscores = xzscore_frame(base, inputs)
-    out: dict[str, np.ndarray] = {}
-    for row in exprs.itertuples(index=False):
+    return xrank_frame(base, inputs), xzscore_frame(base, inputs)
+
+
+def compute_expression_block_from_inputs(
+    ranks: pd.DataFrame,
+    zscores: pd.DataFrame,
+    exprs: pd.DataFrame,
+) -> pd.DataFrame:
+    values = compute_expression_array_from_inputs(ranks, zscores, exprs)
+    return pd.DataFrame(values, columns=exprs["name"].tolist(), index=ranks.index if len(ranks) else zscores.index)
+
+
+def compute_expression_array_from_inputs(
+    ranks: pd.DataFrame,
+    zscores: pd.DataFrame,
+    exprs: pd.DataFrame,
+) -> np.ndarray:
+    index_len = len(ranks) if len(ranks) else len(zscores)
+    values = np.empty((index_len, len(exprs)), dtype=np.float32)
+    for col_idx, row in enumerate(exprs.itertuples(index=False)):
         if row.op.startswith("rank_"):
             left = ranks[row.left].to_numpy(np.float32, copy=False)
             right = ranks[row.right].to_numpy(np.float32, copy=False)
@@ -207,16 +223,20 @@ def compute_expression_block(base: pd.DataFrame, exprs: pd.DataFrame) -> pd.Data
             right = zscores[row.right].to_numpy(np.float32, copy=False)
 
         if row.op.endswith("_add"):
-            val = left + right
+            np.add(left, right, out=values[:, col_idx])
         elif row.op.endswith("_spread"):
-            val = left - right
+            np.subtract(left, right, out=values[:, col_idx])
         elif row.op.endswith("_product"):
-            val = left * right
+            np.multiply(left, right, out=values[:, col_idx])
         elif row.op == "rank_gate_pos":
-            val = np.where(right > 0, left, 0.0)
+            values[:, col_idx] = np.where(right > 0, left, 0.0)
         elif row.op == "rank_gate_neg":
-            val = np.where(right < 0, left, 0.0)
+            values[:, col_idx] = np.where(right < 0, left, 0.0)
         else:
             raise ValueError(f"unknown expression op: {row.op}")
-        out[row.name] = np.asarray(val, dtype=np.float32)
-    return pd.DataFrame(out, index=base.index)
+    return values
+
+
+def compute_expression_block(base: pd.DataFrame, exprs: pd.DataFrame) -> pd.DataFrame:
+    ranks, zscores = precompute_expression_inputs(base, exprs)
+    return compute_expression_block_from_inputs(ranks, zscores, exprs)

@@ -21,7 +21,7 @@ The project is designed for the AutoDL workspace layout:
   exact catalog lives in `references/futures/factor_catalog.csv`.
 - In-sample window defaults to 2018-2019.
 - OOS window defaults to 2020.
-- Baselines: Ridge and LightGBM.
+- Baselines: Ridge, LightGBM, and MLP research scripts.
 - Factor mining: dynamic expression generation plus a multi-layer scorecard.
   Full acceptance is not based on full-sample IC or a single backtest.
 - Backtest: simple timestamp-level long-short spread on prediction ranks.
@@ -58,8 +58,8 @@ The current mining skill is designed as a continuous loop:
 5. Select candidates greedily only from `decision_reason == pass_all`, with
    family/operator diversity and candidate-peer correlation checks, then write
    `outputs/expression_sets/new100.csv`.
-6. Validate selected factors inside Ridge and LightGBM with leave-one-factor-out
-   or shuffle tests before reporting model IC lift.
+6. Validate selected factors inside Ridge, LightGBM, or MLP with
+   leave-one-factor-out or shuffle tests before reporting model IC lift.
 
 Default scorecard thresholds are explicit and shared across scripts:
 
@@ -75,7 +75,8 @@ Default scorecard thresholds are explicit and shared across scripts:
 
 This design borrows the useful v3 idea of a persistent accepted pool,
 low-correlation gating, train-only discovery, OOS reporting, and full audit logs,
-but adapts it to this futures factor panel and local Ridge/LightGBM workflow.
+but adapts it to this futures factor panel and local Ridge/LightGBM/MLP
+workflow.
 
 Model comparison on 2020 OOS, using `pred_xsz` IC:
 
@@ -179,6 +180,52 @@ result comes from the 45 Ridge-retained factors, which add +0.001078 IC over the
 617-factor base. The full strict-round formula and retained/removed lists are
 committed at `references/futures/scorecard_strict_factors_summary.json`.
 
+1000-factor Ridge/MLP scaling round: the current skill was then run at larger
+scale. It generated 162,208 expression candidates, kept 40,000 after the cheap
+train-only sample-IC/data-quality prefilter, evaluated the top 25,000 with the
+full scorecard, and selected 1,000 strict `pass_all` factors after excluding
+prior expression rounds and enforcing candidate-peer max absolute correlation
+<= 0.90. No 2020 OOS IC was used in this selection stage. The selected factors
+had max candidate-peer absolute correlation 0.899143 and operator diversity
+(`z_product`: 763, `z_spread`: 161, `z_add`: 76).
+
+For MLP, the recipe was taken from the prior best single-model experiment
+`mlp_overlap333_xsz_hl12_n1200k`: overlap333 features, `label_xsz` target,
+12-month half-life training weights, hidden size 192, dropout 0.12, 5 epochs,
+batch size 8192, AdamW lr 0.001, and weight decay 0.0001. In this project run
+the MLP is trained once on 2018-2019 sampled data and reported on full-year
+2020 OOS, matching the Ridge split used here.
+
+Model-specific 2020-01 incremental validation of the 1,000 new factors:
+
+| Model | Base factors | Candidate factors | Incremental test | Retained new factors | Final factors | Validation-month IC |
+| --- | ---: | ---: | --- | ---: | ---: | ---: |
+| Ridge | 617 | 1,617 | exact leave-one-factor-out retrain; keep if IC declines when removed | 463 / 1000 | 1,080 | 0.066742 |
+| MLP | 333 | 1,333 | single-factor standard-normal replacement; keep if IC declines when shuffled | 527 / 1000 | 860 | 0.046243 |
+| Ridge and MLP | 617 / 333 | n/a | retained by both model-specific tests | 265 / 1000 | n/a | n/a |
+
+2020 full-year OOS IC, using `pred_xsz`:
+
+| Model | Feature set | Factors | 2020 OOS IC | Monthly mean IC | Monthly IR | Delta vs base | Delta vs +1000 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Ridge | 617 validated base | 617 | 0.040171 | 0.042578 | 3.381732 | baseline | n/a |
+| Ridge | base + 1000 scorecard factors | 1,617 | 0.041995 | 0.044123 | 3.661060 | +0.001824 | baseline |
+| Ridge | base + 463 Ridge-retained factors | 1,080 | 0.042479 | 0.045262 | 2.987944 | +0.002308 | +0.000484 |
+| MLP | 333 overlap base | 333 | 0.044120 | 0.046727 | 3.402218 | baseline | n/a |
+| MLP | base + 1000 scorecard factors | 1,333 | 0.037748 | 0.038622 | 5.291706 | -0.006372 | baseline |
+| MLP | base + 527 MLP-retained factors | 860 | 0.041862 | 0.043864 | 4.181329 | -0.002258 | +0.004114 |
+
+The large-scale round is strongly positive for Ridge: adding all 1,000
+scorecard factors improves 2020 OOS IC by +0.001824, and the Ridge
+leave-one-factor-out filter lifts the final 1,080-factor model to +0.002308
+over the 617-factor base. For this static MLP recipe, the raw 1,000-factor
+expansion overloaded or diluted the compact 333-factor base; the shuffle filter
+is still useful because it recovers +0.004114 IC versus directly adding all
+1,000 factors, but the filtered MLP remains -0.002258 below its compact base.
+The full 1,000-factor formula list, scorecard diagnostics, Ridge/MLP retained
+lists, and IC comparison are committed at
+`references/futures/new1000_ridge_mlp_summary.json`.
+
 For the first 100-factor round, the overlap between Ridge-retained and
 LightGBM-retained new factors was 26. These model-specific validations give
 independent evidence that the mined expression factors are not merely duplicates
@@ -189,6 +236,7 @@ of the original pool. The full reports are:
 - `references/futures/old_effective_factors_summary.json`
 - `references/futures/round2_effective_factors_summary.json`
 - `references/futures/scorecard_strict_factors_summary.json`
+- `references/futures/new1000_ridge_mlp_summary.json`
 - `references/futures/factor_acceptance_standards.json`
 
 ## Quick Start
@@ -207,6 +255,8 @@ For the current scorecard-based expression mining loop:
 
 ```bash
 PYTHONPATH=src python scripts/run_continuous_factor_mining.py --config configs/futures.yaml --target 100
+# For a large scaling run, increase the target and candidate pool.
+PYTHONPATH=src python scripts/run_continuous_factor_mining.py --config configs/futures.yaml --target 1000
 ```
 
 Or run the detailed scorecard directly after generating candidates and IC parts:

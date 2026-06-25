@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from fu_alpha_research.config import load_config
-from fu_alpha_research.expressions import compute_expression_block, load_expression_table
+from fu_alpha_research.expressions import compute_expression_block_from_inputs, load_expression_table, precompute_expression_inputs
 from fu_alpha_research.factor_scorecard import (
     ScorecardThresholds,
     composite_score,
@@ -245,7 +245,8 @@ def evaluate_candidate_values(
 def select_with_candidate_correlation(
     scorecard: pd.DataFrame,
     candidates: pd.DataFrame,
-    sample: pd.DataFrame,
+    ranks: pd.DataFrame,
+    zscores: pd.DataFrame,
     *,
     target: int,
     thresholds: ScorecardThresholds,
@@ -269,7 +270,7 @@ def select_with_candidate_correlation(
         op = str(expr.iloc[0]["op"])
         if max_per_op and op_counts.get(op, 0) >= max_per_op:
             continue
-        values = compute_expression_block(sample, expr)[name].to_numpy(np.float32, copy=False)
+        values = compute_expression_block_from_inputs(ranks, zscores, expr)[name].to_numpy(np.float32, copy=False)
         z, _names = standardize_matrix(values.reshape(-1, 1))
         max_peer_corr = 0.0
         for _prior_name, prior in selected_vectors:
@@ -293,6 +294,7 @@ def main() -> None:
     parser.add_argument("--config", default="configs/futures.yaml")
     parser.add_argument("--candidates", default=None)
     parser.add_argument("--ic-scores", default=None)
+    parser.add_argument("--selection-ic-source", choices=["ic_scores", "sample"], default="ic_scores")
     parser.add_argument("--library-feature-file", default=None)
     parser.add_argument("--sample-start", default=None)
     parser.add_argument("--sample-end", default=None)
@@ -321,12 +323,28 @@ def main() -> None:
     cfg = load_config(args.config)
     cand_path = resolve_output_path(cfg.reports_dir, args.candidates, cfg.reports_dir / "new_factor_candidates.csv")
     candidates = load_expression_table(cand_path)
-    scores = load_ic_scores(cfg, args.ic_scores)
-    candidates = candidates.merge(scores.drop(columns=[c for c in candidates.columns if c in scores.columns and c != "name"]), on="name", how="left")
-    candidates["same_sign"] = np.sign(candidates["is_ic"]) == np.sign(candidates["oos_ic"])
-    candidates["abs_is_ic"] = candidates["is_ic"].abs()
-    candidates["abs_oos_ic"] = candidates["oos_ic"].abs()
-    candidates = candidates.sort_values(["same_sign", "abs_oos_ic", "abs_is_ic"], ascending=False)
+    if args.selection_ic_source == "ic_scores":
+        scores = load_ic_scores(cfg, args.ic_scores)
+        candidates = candidates.merge(
+            scores.drop(columns=[c for c in candidates.columns if c in scores.columns and c != "name"]),
+            on="name",
+            how="left",
+        )
+        candidates["same_sign"] = np.sign(candidates["is_ic"]) == np.sign(candidates["oos_ic"])
+        candidates["abs_is_ic"] = candidates["is_ic"].abs()
+        candidates["abs_oos_ic"] = candidates["oos_ic"].abs()
+        candidates = candidates.sort_values(["same_sign", "abs_oos_ic", "abs_is_ic"], ascending=False)
+    else:
+        candidates["is_ic"] = np.nan
+        candidates["is_n"] = np.nan
+        candidates["is_coverage_proxy"] = np.nan
+        candidates["oos_ic"] = np.nan
+        candidates["oos_n"] = np.nan
+        candidates["oos_coverage_proxy"] = np.nan
+        candidates["same_sign"] = True
+        candidates["abs_is_ic"] = np.nan
+        candidates["abs_oos_ic"] = np.nan
+        candidates["effective"] = False
     if args.max_candidates:
         candidates = candidates.head(args.max_candidates).copy()
 
@@ -349,12 +367,13 @@ def main() -> None:
     library_raw = sample[library_features].copy().astype(np.float32) if library_features else pd.DataFrame(index=sample.index)
     library_z, library_names = standardize_matrix(library_raw) if library_features else (np.empty((len(sample), 0)), [])
     label = sample["label"].to_numpy(np.float64, copy=False)
+    sample_ranks, sample_zscores = precompute_expression_inputs(sample, candidates)
 
     rows = []
     for start in range(0, len(candidates), args.block_size):
         end = min(start + args.block_size, len(candidates))
         block = candidates.iloc[start:end].reset_index(drop=True)
-        values = compute_expression_block(sample, block)
+        values = compute_expression_block_from_inputs(sample_ranks, sample_zscores, block)
         library_corrs = block_library_correlations(values, library_z, library_names)
         for name in block["name"]:
             metric = evaluate_candidate_values(
@@ -370,7 +389,10 @@ def main() -> None:
 
     detail = pd.DataFrame(rows)
     scorecard = candidates.merge(detail, on="name", how="left")
-    scorecard["selection_ic"] = scorecard["is_ic"].where(scorecard["is_ic"].notna(), scorecard["pearson_ic"])
+    if args.selection_ic_source == "sample":
+        scorecard["selection_ic"] = scorecard["pearson_ic"]
+    else:
+        scorecard["selection_ic"] = scorecard["is_ic"].where(scorecard["is_ic"].notna(), scorecard["pearson_ic"])
     scorecard["abs_selection_ic"] = scorecard["selection_ic"].abs()
     scorecard["sample_same_sign"] = np.sign(scorecard["selection_ic"]) == np.sign(scorecard["pearson_ic"])
     thresholds = ScorecardThresholds(
@@ -395,7 +417,8 @@ def main() -> None:
     scorecard = select_with_candidate_correlation(
         scorecard,
         candidates,
-        sample,
+        sample_ranks,
+        sample_zscores,
         target=args.target,
         thresholds=thresholds,
         pool_size=args.selection_pool,
@@ -443,6 +466,7 @@ def main() -> None:
         "sample_end": args.sample_end or cfg.is_end,
         "library_feature_file": str(library_file),
         "library_features_compared": int(len(library_names)),
+        "selection_ic_source": args.selection_ic_source,
         "thresholds": thresholds.__dict__,
         "grade_counts": {str(k): int(v) for k, v in scorecard["final_grade"].value_counts().to_dict().items()},
         "gate_pass_counts": {
