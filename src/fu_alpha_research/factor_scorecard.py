@@ -146,46 +146,112 @@ def residual_ic(values: np.ndarray, label: np.ndarray, closest: np.ndarray | Non
 class ScorecardThresholds:
     min_coverage: float = 0.70
     min_abs_ic: float = 0.001
+    min_abs_rank_ic: float = 0.0005
     min_monthly_hit_rate: float = 0.50
+    min_monthly_ic_count: int = 6
     min_product_hit_rate: float = 0.45
+    min_regime_hit_rate: float = 0.40
+    min_bucket_monotonicity: float = 0.25
     max_abs_corr: float = 0.90
     max_outlier_ratio: float = 0.02
+    max_turnover_proxy: float = 0.85
+    min_abs_residual_ic: float = 0.001
 
 
-def final_grade(row: pd.Series, thresholds: ScorecardThresholds) -> str:
+def decision_flags(row: pd.Series, thresholds: ScorecardThresholds) -> dict[str, bool | str]:
+    selection_ic = float(row.get("selection_ic", row.get("oos_ic", 0.0)) or 0.0)
+    abs_selection_ic = abs(selection_ic)
+    abs_rank_ic = abs(float(row.get("rank_ic", 0.0) or 0.0))
+    same_sign = bool(row.get("sample_same_sign", row.get("same_sign", False)))
+    spread = float(row.get("bucket_top_bottom_spread", 0.0) or 0.0)
+    monotonicity = abs(float(row.get("bucket_monotonicity", 0.0) or 0.0))
+    turnover = float(row.get("turnover_proxy", 0.0) or 0.0)
+    max_corr = float(row.get("max_abs_corr_to_library", 1.0) or 1.0)
+    peer_corr = float(row.get("candidate_peer_max_abs_corr", 0.0) or 0.0)
+    if not np.isfinite(peer_corr):
+        peer_corr = 0.0
+    residual_abs_ic = abs(float(row.get("residual_ic", 0.0) or 0.0))
+
     pass_data = (
         float(row.get("coverage", 0.0) or 0.0) >= thresholds.min_coverage
         and float(row.get("outlier_ratio", 1.0) or 1.0) <= thresholds.max_outlier_ratio
         and float(row.get("std", 0.0) or 0.0) > 1e-8
     )
-    if not pass_data:
+    pass_ic = (
+        same_sign
+        and abs_selection_ic >= thresholds.min_abs_ic
+        and abs_rank_ic >= thresholds.min_abs_rank_ic
+        and float(row.get("monthly_ic_hit_rate", 0.0) or 0.0) >= thresholds.min_monthly_hit_rate
+        and int(row.get("monthly_ic_count", 0) or 0) >= thresholds.min_monthly_ic_count
+    )
+    pass_bucket = (
+        np.isfinite(spread)
+        and np.sign(spread) == np.sign(selection_ic)
+        and monotonicity >= thresholds.min_bucket_monotonicity
+    )
+    pass_regime = (
+        float(row.get("product_ic_hit_rate", 0.0) or 0.0) >= thresholds.min_product_hit_rate
+        and float(row.get("liquidity_regime_ic_hit_rate", 0.0) or 0.0) >= thresholds.min_regime_hit_rate
+        and float(row.get("volatility_regime_ic_hit_rate", 0.0) or 0.0) >= thresholds.min_regime_hit_rate
+    )
+    pass_trading = (not np.isfinite(turnover)) or turnover <= thresholds.max_turnover_proxy
+    pass_incremental = (
+        (max_corr <= thresholds.max_abs_corr and peer_corr <= thresholds.max_abs_corr)
+        or residual_abs_ic >= thresholds.min_abs_residual_ic
+    )
+    pass_robustness = pass_ic and pass_incremental
+    reasons = []
+    for key, value in {
+        "data": pass_data,
+        "ic": pass_ic,
+        "bucket": pass_bucket,
+        "regime": pass_regime,
+        "trading": pass_trading,
+        "incremental": pass_incremental,
+        "robustness": pass_robustness,
+    }.items():
+        if not value:
+            reasons.append(f"fail_{key}")
+    return {
+        "pass_data_quality": bool(pass_data),
+        "pass_ic": bool(pass_ic),
+        "pass_bucket": bool(pass_bucket),
+        "pass_regime": bool(pass_regime),
+        "pass_trading": bool(pass_trading),
+        "pass_incremental": bool(pass_incremental),
+        "pass_robustness": bool(pass_robustness),
+        "decision_reason": "pass_all" if not reasons else ",".join(reasons),
+    }
+
+
+def final_grade(row: pd.Series, thresholds: ScorecardThresholds) -> str:
+    flags = decision_flags(row, thresholds)
+    if not flags["pass_data_quality"]:
         return "E"
 
-    same_sign = bool(row.get("sample_same_sign", row.get("same_sign", False)))
     selection_ic = float(row.get("selection_ic", row.get("oos_ic", 0.0)) or 0.0)
     abs_selection_ic = abs(selection_ic)
-    abs_rank_ic = abs(float(row.get("rank_ic", 0.0) or 0.0))
     monthly_hit = float(row.get("monthly_ic_hit_rate", 0.0) or 0.0)
-    product_hit = float(row.get("product_ic_hit_rate", 0.0) or 0.0)
-    max_corr = float(row.get("max_abs_corr_to_library", 1.0) or 1.0)
-    residual_abs_ic = abs(float(row.get("residual_ic", 0.0) or 0.0))
-    monotonicity = abs(float(row.get("bucket_monotonicity", 0.0) or 0.0))
-    spread = float(row.get("bucket_top_bottom_spread", 0.0) or 0.0)
-    turnover = float(row.get("turnover_proxy", 0.0) or 0.0)
 
-    pass_ic = same_sign and abs_selection_ic >= thresholds.min_abs_ic and monthly_hit >= thresholds.min_monthly_hit_rate
-    pass_corr = max_corr <= thresholds.max_abs_corr or residual_abs_ic >= thresholds.min_abs_ic
-    pass_bucket = np.isfinite(spread) and np.sign(spread) == np.sign(selection_ic) and monotonicity >= 0.25
-    pass_regime = product_hit >= thresholds.min_product_hit_rate
-    low_turnover = (not np.isfinite(turnover)) or turnover <= 0.85
-
-    if pass_ic and pass_bucket and pass_regime and pass_corr and low_turnover and abs_rank_ic >= thresholds.min_abs_ic:
+    if all(
+        bool(flags[key])
+        for key in (
+            "pass_ic",
+            "pass_bucket",
+            "pass_regime",
+            "pass_trading",
+            "pass_incremental",
+            "pass_robustness",
+        )
+    ):
         return "A" if abs_selection_ic >= thresholds.min_abs_ic * 2 and monthly_hit >= 0.58 else "B"
-    if pass_ic and pass_corr and (pass_bucket or pass_regime):
+    if flags["pass_ic"] and flags["pass_incremental"] and flags["pass_robustness"] and (
+        flags["pass_bucket"] or flags["pass_regime"]
+    ):
         return "B"
-    if pass_ic and pass_corr:
+    if flags["pass_ic"] and flags["pass_incremental"]:
         return "C"
-    if same_sign and abs_selection_ic >= thresholds.min_abs_ic * 0.5:
+    if bool(row.get("sample_same_sign", row.get("same_sign", False))) and abs_selection_ic >= thresholds.min_abs_ic * 0.5:
         return "D"
     return "E"
 

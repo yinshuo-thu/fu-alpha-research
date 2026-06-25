@@ -28,6 +28,8 @@ The project is designed for the AutoDL workspace layout:
 - Factor acceptance now follows the multi-layer framework in
   `docs/factor_evaluation_framework.md`, covering data quality, IC, bucket,
   regime, trading simulation, incremental value, robustness, and A-E decisions.
+- Default numerical gates are versioned in
+  `references/futures/factor_acceptance_standards.json`.
 
 ## Validation Evidence
 
@@ -53,10 +55,23 @@ The current mining skill is designed as a continuous loop:
 4. Enforce low-correlation gates: a candidate should have max absolute
    correlation <= 0.90 against the existing library, unless its residualized IC
    still justifies keeping it as a model feature.
-5. Select candidates greedily with family/operator diversity and candidate-peer
-   correlation checks, then write `outputs/expression_sets/new100.csv`.
+5. Select candidates greedily only from `decision_reason == pass_all`, with
+   family/operator diversity and candidate-peer correlation checks, then write
+   `outputs/expression_sets/new100.csv`.
 6. Validate selected factors inside Ridge and LightGBM with leave-one-factor-out
    or shuffle tests before reporting model IC lift.
+
+Default scorecard thresholds are explicit and shared across scripts:
+
+| Gate | Default standard |
+| --- | --- |
+| Data quality | coverage >= 0.70, outlier ratio <= 0.02, non-constant values |
+| IC | abs(selection IC) >= 0.001, abs(rank IC) >= 0.0005, monthly hit rate >= 0.50, at least 6 monthly IC observations |
+| Bucket | top-bottom spread has the same sign as selection IC, abs(monotonicity) >= 0.25 |
+| Regime | product hit rate >= 0.45, liquidity-regime hit rate >= 0.40, volatility-regime hit rate >= 0.40 |
+| Trading | turnover proxy <= 0.85 for A-grade factors |
+| Incremental | max abs corr <= 0.90 versus library and selected peers, or abs(residual IC) >= 0.001 |
+| Robustness | scorecard artifact plus model-incremental validation |
 
 This design borrows the useful v3 idea of a persistent accepted pool,
 low-correlation gating, train-only discovery, OOS reporting, and full audit logs,
@@ -128,6 +143,42 @@ expression and feature-set artifacts are:
 - `outputs/model_feature_sets/ridge617_plus_round2_retained42.txt`
 - `outputs/model_feature_sets/lgbm643_plus_round2_retained40.txt`
 
+Strict scorecard optimization round: the latest mining pass evaluated 12,000
+formula candidates with explicit gates for data quality, Pearson/rank IC,
+monthly/product/regime stability, bucket shape, turnover proxy, library
+correlation, residualized IC, and candidate-peer correlation. The cheap IS/OOS
+IC screen was used only as a prefilter. Among the 12,000 candidates, 139 passed
+all scorecard gates. The final selector kept 100 `pass_all` factors with max
+candidate-peer absolute correlation 0.878208 and operator diversity
+(`z_spread`: 50, `z_product`: 46, `z_add`: 3, `rank_spread`: 1).
+
+Those 100 strict scorecard factors were then added to the existing model
+feature bases and checked again with model-specific incremental tests on
+2020-01:
+
+| Model | Validation base | Incremental test | Strict scorecard factors retained | Validation-month IC |
+| --- | ---: | --- | ---: | ---: |
+| Ridge | 617 | exact leave-one-factor-out retrain; keep if IC declines when removed | 45 / 100 | 0.084562 |
+| LightGBM | 643 | single-factor standard-normal replacement; keep if IC declines when shuffled | 59 / 100 | 0.046381 |
+| Ridge and LightGBM | 617 / 643 | retained by both model-specific tests | 27 / 100 | n/a |
+
+Ridge 2020 full-year OOS IC, using `pred_xsz`, improved after adding the new
+strict scorecard factors:
+
+| Ridge feature set | Factors | 2020 OOS IC | Delta vs 617 base |
+| --- | ---: | ---: | ---: |
+| existing validated base | 617 | 0.041014 | baseline |
+| base + 100 strict scorecard factors | 717 | 0.041586 | +0.000571 |
+| base + 45 Ridge-retained strict factors | 662 | 0.042092 | +0.001078 |
+| base + 27 factors retained by both Ridge and LightGBM | 644 | 0.041892 | +0.000878 |
+
+The model-incremental tests are intentionally stricter than the scorecard:
+the skill generated 100 factors that passed every multi-layer scorecard gate,
+while Ridge and LightGBM kept model-specific subsets. The strongest Ridge
+result comes from the 45 Ridge-retained factors, which add +0.001078 IC over the
+617-factor base. The full strict-round formula and retained/removed lists are
+committed at `references/futures/scorecard_strict_factors_summary.json`.
+
 For the first 100-factor round, the overlap between Ridge-retained and
 LightGBM-retained new factors was 26. These model-specific validations give
 independent evidence that the mined expression factors are not merely duplicates
@@ -137,6 +188,8 @@ of the original pool. The full reports are:
 - `reports/factor_effectiveness_validation.md`
 - `references/futures/old_effective_factors_summary.json`
 - `references/futures/round2_effective_factors_summary.json`
+- `references/futures/scorecard_strict_factors_summary.json`
+- `references/futures/factor_acceptance_standards.json`
 
 ## Quick Start
 
@@ -202,6 +255,8 @@ directory contains only small metadata:
 - `factor_catalog.csv`
 - `old_effective_factors_summary.json`
 - `round2_effective_factors_summary.json`
+- `scorecard_strict_factors_summary.json`
+- `factor_acceptance_standards.json`
 
 Do not commit `/root/autodl-tmp/quant/data/raw`, `selected_month_parts`,
 `data_factors_big.parquet`, or prediction parquet files.

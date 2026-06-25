@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "artifact": "factor_acceptance_standards",
+  "description": "Unified default acceptance standards for futures expression factors. Fast IC screens are prefilters only; final acceptance requires scorecard gates plus model-incremental validation.",
+  "windows": {
+    "discovery_is": "2018-01-01..2019-12-31",
+    "oos_report": "2020-01-01..2020-12-31",
+    "oos_policy": "OOS metrics are report evidence and should not be repeatedly tuned."
+  },
+  "data_quality": {
+    "min_coverage": 0.7,
+    "max_outlier_ratio": 0.02,
+    "min_std": 1e-8,
+    "required": true
+  },
+  "ic": {
+    "min_abs_selection_ic": 0.001,
+    "min_abs_rank_ic": 0.0005,
+    "min_monthly_ic_hit_rate": 0.5,
+    "min_monthly_ic_count": 6,
+    "require_selection_sample_same_sign": true
+  },
+  "bucket": {
+    "min_abs_monotonicity": 0.25,
+    "require_top_bottom_spread_same_sign": true
+  },
+  "regime": {
+    "min_product_ic_hit_rate": 0.45,
+    "min_liquidity_regime_ic_hit_rate": 0.4,
+    "min_volatility_regime_ic_hit_rate": 0.4
+  },
+  "trading": {
+    "max_turnover_proxy": 0.85,
+    "cost_policy": "A-grade factors must pass the turnover proxy; B/C model features can survive if incremental model evidence is strong."
+  },
+  "incremental": {
+    "max_abs_corr_to_library": 0.9,
+    "max_abs_corr_to_selected_peer": 0.9,
+    "min_abs_residual_ic": 0.001,
+    "high_corr_escape_rule": "A high-correlation candidate can be retained only when residualized IC remains above threshold or model-incremental tests pass."
+  },
+  "robustness": {
+    "require_scorecard_artifact": true,
+    "require_model_incremental_validation": true,
+    "ridge_validation": "Exact leave-one-factor-out retrain; retain if removing the factor lowers validation-month pred_xsz IC.",
+    "lightgbm_validation": "Single-factor standard-normal replacement; retain if replacement lowers validation-month pred_xsz IC."
+  },
+  "final_artifact_rule": {
+    "accepted_expression_set": "decision_reason == pass_all",
+    "max_abs_corr_to_selected_peer": 0.9,
+    "model_effective_sets": "Report Ridge-retained, LightGBM-retained, and intersection subsets separately; do not assume every scorecard-passed factor is model-effective."
+  },
+  "decision": {
+    "A": "Passes data quality, IC, bucket, regime, trading, incremental, and robustness gates.",
+    "B": "Passes data quality, IC, incremental, and robustness gates, with either bucket or regime support; suitable as a model feature.",
+    "C": "Passes data quality, IC, and incremental gates but is conditional by product/regime.",
+    "D": "Watchlist; has partial signal but fails an important gate.",
+    "E": "Discard; fails data quality, IC, leakage, or incremental value."
+  }
+}

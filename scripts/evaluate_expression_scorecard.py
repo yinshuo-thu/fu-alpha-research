@@ -13,8 +13,8 @@ from fu_alpha_research.expressions import compute_expression_block, load_express
 from fu_alpha_research.factor_scorecard import (
     ScorecardThresholds,
     composite_score,
+    decision_flags,
     final_grade,
-    max_library_correlation,
     product_code,
     rank_corr,
     residual_ic,
@@ -61,14 +61,23 @@ def sample_months(store: FactorStore, start: str, end: str, rows_per_month: int,
     months = store.available_months(start, end)
     out: list[tuple[str, np.ndarray]] = []
     for month in months:
-        # Read only a tiny metadata column first to determine row count cheaply.
+        # Sample whole timestamps so cross-sectional bucket/rank tests remain meaningful.
         meta = store.read_month(month, columns=[], sort=False)[["symbol", "datetime", "label"]]
-        valid_idx = np.flatnonzero(meta["label"].notna().to_numpy())
-        if rows_per_month and len(valid_idx) > rows_per_month:
-            chosen = rng.choice(valid_idx, size=rows_per_month, replace=False)
-            chosen = np.sort(chosen)
+        valid = meta["label"].notna()
+        valid_meta = meta.loc[valid, ["datetime"]].copy()
+        if valid_meta.empty:
+            out.append((month, np.array([], dtype=np.int64)))
+            continue
+        counts = valid_meta.groupby("datetime", sort=False).size()
+        if rows_per_month and int(counts.sum()) > rows_per_month:
+            avg_cross_section = max(float(counts.median()), 1.0)
+            n_times = max(1, int(np.ceil(rows_per_month / avg_cross_section)))
+            n_times = min(n_times, len(counts))
+            chosen_times = set(rng.choice(counts.index.to_numpy(), size=n_times, replace=False))
+            chosen = np.flatnonzero(valid.to_numpy() & meta["datetime"].isin(chosen_times).to_numpy())
         else:
-            chosen = valid_idx
+            chosen = np.flatnonzero(valid.to_numpy())
+        chosen = np.sort(chosen)
         out.append((month, chosen))
     return out
 
@@ -160,14 +169,39 @@ def regime_labels(sample: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
     return liquidity.astype(str), volatility.astype(str)
 
 
+def block_library_correlations(
+    values: pd.DataFrame,
+    library_z: np.ndarray,
+    library_names: list[str],
+) -> dict[str, dict[str, object]]:
+    if library_z.size == 0 or not library_names:
+        return {
+            name: {"max_abs_corr": 0.0, "max_corr": 0.0, "closest_factor": "", "compared": 0}
+            for name in values.columns
+        }
+    block_z, block_names = standardize_matrix(values)
+    corr = (block_z.astype(np.float64).T @ library_z.astype(np.float64)) / max(len(block_z), 1)
+    corr[~np.isfinite(corr)] = 0.0
+    out: dict[str, dict[str, object]] = {}
+    for row_idx, name in enumerate(block_names):
+        col = corr[row_idx]
+        best = int(np.argmax(np.abs(col)))
+        out[name] = {
+            "max_abs_corr": float(abs(col[best])),
+            "max_corr": float(col[best]),
+            "closest_factor": library_names[best],
+            "compared": int(len(library_names)),
+        }
+    return out
+
+
 def evaluate_candidate_values(
     *,
     name: str,
     values: np.ndarray,
     sample: pd.DataFrame,
     label: np.ndarray,
-    library_z: np.ndarray,
-    library_names: list[str],
+    library_corr: dict[str, object],
     library_raw: pd.DataFrame,
 ) -> dict[str, object]:
     finite = np.isfinite(values)
@@ -181,8 +215,7 @@ def evaluate_candidate_values(
     else:
         outlier_ratio = 1.0
 
-    lib_corr = max_library_correlation(values, library_z, library_names)
-    closest_name = str(lib_corr.get("closest_factor", ""))
+    closest_name = str(library_corr.get("closest_factor", ""))
     closest = library_raw[closest_name].to_numpy(np.float32, copy=False) if closest_name in library_raw.columns else None
     bucket = signed_bucket_stats(values, label, sample["datetime"], buckets=5)
     liquidity, volatility = regime_labels(sample)
@@ -195,10 +228,10 @@ def evaluate_candidate_values(
         "pearson_ic": safe_corr(values, label),
         "rank_ic": rank_corr(values, label),
         "turnover_proxy": turnover_proxy(values, sample["symbol"], sample["datetime"]),
-        "max_abs_corr_to_library": float(lib_corr["max_abs_corr"]),
-        "max_corr_to_library": float(lib_corr["max_corr"]),
+        "max_abs_corr_to_library": float(library_corr["max_abs_corr"]),
+        "max_corr_to_library": float(library_corr["max_corr"]),
         "closest_library_factor": closest_name,
-        "library_factors_compared": int(lib_corr["compared"]),
+        "library_factors_compared": int(library_corr["compared"]),
         "residual_ic": residual_ic(values, label, closest),
     }
     row.update(monthly_ic(values, label, sample["month"]))
@@ -222,7 +255,7 @@ def select_with_candidate_correlation(
     selected_names: list[str] = []
     selected_vectors: list[tuple[str, np.ndarray]] = []
     op_counts: dict[str, int] = {}
-    ranked = scorecard[scorecard["final_grade"].isin(["A", "B", "C"])].copy()
+    ranked = scorecard[scorecard["decision_reason"].eq("pass_all")].copy()
     ranked = ranked.sort_values(["composite_score", "abs_selection_ic", "abs_is_ic"], ascending=False).head(pool_size)
     candidate_by_name = candidates.set_index("name", drop=False)
 
@@ -272,7 +305,16 @@ def main() -> None:
     parser.add_argument("--write-partial", action="store_true")
     parser.add_argument("--min-coverage", type=float, default=0.70)
     parser.add_argument("--min-abs-ic", type=float, default=0.001)
+    parser.add_argument("--min-abs-rank-ic", type=float, default=0.0005)
+    parser.add_argument("--min-monthly-hit-rate", type=float, default=0.50)
+    parser.add_argument("--min-monthly-ic-count", type=int, default=6)
+    parser.add_argument("--min-product-hit-rate", type=float, default=0.45)
+    parser.add_argument("--min-regime-hit-rate", type=float, default=0.40)
+    parser.add_argument("--min-bucket-monotonicity", type=float, default=0.25)
     parser.add_argument("--max-corr", type=float, default=0.90)
+    parser.add_argument("--max-outlier-ratio", type=float, default=0.02)
+    parser.add_argument("--max-turnover-proxy", type=float, default=0.85)
+    parser.add_argument("--min-abs-residual-ic", type=float, default=0.001)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
@@ -313,14 +355,14 @@ def main() -> None:
         end = min(start + args.block_size, len(candidates))
         block = candidates.iloc[start:end].reset_index(drop=True)
         values = compute_expression_block(sample, block)
+        library_corrs = block_library_correlations(values, library_z, library_names)
         for name in block["name"]:
             metric = evaluate_candidate_values(
                 name=name,
                 values=values[name].to_numpy(np.float32, copy=False),
                 sample=sample,
                 label=label,
-                library_z=library_z,
-                library_names=library_names,
+                library_corr=library_corrs[name],
                 library_raw=library_raw,
             )
             rows.append(metric)
@@ -334,8 +376,19 @@ def main() -> None:
     thresholds = ScorecardThresholds(
         min_coverage=args.min_coverage,
         min_abs_ic=args.min_abs_ic,
+        min_abs_rank_ic=args.min_abs_rank_ic,
+        min_monthly_hit_rate=args.min_monthly_hit_rate,
+        min_monthly_ic_count=args.min_monthly_ic_count,
+        min_product_hit_rate=args.min_product_hit_rate,
+        min_regime_hit_rate=args.min_regime_hit_rate,
+        min_bucket_monotonicity=args.min_bucket_monotonicity,
         max_abs_corr=args.max_corr,
+        max_outlier_ratio=args.max_outlier_ratio,
+        max_turnover_proxy=args.max_turnover_proxy,
+        min_abs_residual_ic=args.min_abs_residual_ic,
     )
+    flag_frame = scorecard.apply(lambda row: decision_flags(row, thresholds), axis=1, result_type="expand")
+    scorecard = pd.concat([scorecard, flag_frame], axis=1)
     scorecard["final_grade"] = scorecard.apply(lambda row: final_grade(row, thresholds), axis=1)
     scorecard["composite_score"] = scorecard.apply(lambda row: composite_score(row, thresholds), axis=1)
     scorecard["candidate_peer_max_abs_corr"] = np.nan
@@ -348,6 +401,21 @@ def main() -> None:
         pool_size=args.selection_pool,
         max_per_op=args.max_per_op,
     )
+    flag_cols = [
+        "pass_data_quality",
+        "pass_ic",
+        "pass_bucket",
+        "pass_regime",
+        "pass_trading",
+        "pass_incremental",
+        "pass_robustness",
+        "decision_reason",
+    ]
+    scorecard = scorecard.drop(columns=[col for col in flag_cols if col in scorecard.columns])
+    flag_frame = scorecard.apply(lambda row: decision_flags(row, thresholds), axis=1, result_type="expand")
+    scorecard = pd.concat([scorecard, flag_frame], axis=1)
+    scorecard["final_grade"] = scorecard.apply(lambda row: final_grade(row, thresholds), axis=1)
+    scorecard["composite_score"] = scorecard.apply(lambda row: composite_score(row, thresholds), axis=1)
     scorecard = scorecard.sort_values(["selected_multilayer", "final_grade", "composite_score"], ascending=[False, True, False])
 
     cfg.reports_dir.mkdir(parents=True, exist_ok=True)
@@ -377,7 +445,21 @@ def main() -> None:
         "library_features_compared": int(len(library_names)),
         "thresholds": thresholds.__dict__,
         "grade_counts": {str(k): int(v) for k, v in scorecard["final_grade"].value_counts().to_dict().items()},
+        "gate_pass_counts": {
+            col: int(scorecard[col].sum())
+            for col in [
+                "pass_data_quality",
+                "pass_ic",
+                "pass_bucket",
+                "pass_regime",
+                "pass_trading",
+                "pass_incremental",
+                "pass_robustness",
+            ]
+            if col in scorecard.columns
+        },
         "selected_op_counts": {str(k): int(v) for k, v in selected["op"].value_counts().to_dict().items()},
+        "pass_all_candidates": int(scorecard["decision_reason"].eq("pass_all").sum()),
         "final_artifacts_written": final_artifacts_written,
         "write_partial": bool(args.write_partial),
     }

@@ -61,6 +61,17 @@ This script writes:
 - `reports/generated/new_factor_scorecard_summary.json`
 - `outputs/expression_sets/new100.csv`
 
+Default final selection is strict: `outputs/expression_sets/new100.csv` is
+written only from candidates whose `decision_reason` is `pass_all`, then filtered
+by candidate-peer absolute correlation <= 0.90 and operator/family diversity.
+The A/B/C/D/E labels remain useful for diagnostics and watchlists, but the
+default accepted-factor artifact should not include a candidate that fails any
+scorecard gate.
+
+The default numerical standards are committed in
+`references/futures/factor_acceptance_standards.json`. Override them only when a
+new experiment explicitly documents why the standard changed.
+
 ## Step 1: Data Quality Check
 
 Required checks:
@@ -83,6 +94,12 @@ Suggested gates:
 - no month where coverage collapses without a documented market reason;
 - winsorized and raw IC signs should not contradict materially;
 - roll-window behavior must be separated from normal-window behavior.
+
+Project default implementation gate:
+
+- coverage >= 0.70;
+- outlier ratio <= 0.02;
+- standard deviation > 1e-8.
 
 ## Step 2: IC Test
 
@@ -110,6 +127,14 @@ Suggested gates:
   explains why;
 - OOS IC remains meaningful after excluding the best month.
 
+Project default implementation gate:
+
+- abs(selection IC) >= 0.001;
+- abs(rank IC) >= 0.0005;
+- monthly IC hit rate >= 0.50;
+- at least 6 monthly IC observations;
+- selection IC and sample Pearson IC have the same sign.
+
 ## Step 3: Bucket Test
 
 The bucket test checks whether signal ordering is usable.
@@ -131,6 +156,11 @@ Suggested gates:
 - the edge is not entirely from one extreme bucket unless the factor is designed
   as a tail alpha;
 - bucket behavior is not reversed in major product groups.
+
+Project default implementation gate:
+
+- top-bottom spread has the same sign as selection IC;
+- abs(bucket monotonicity) >= 0.25.
 
 ## Step 4: Regime Test
 
@@ -157,6 +187,12 @@ Decision rule:
 - narrow but repeatable performance can qualify as C;
 - unstable or sign-flipping regime behavior should be D/E.
 
+Project default implementation gate:
+
+- product IC hit rate >= 0.45;
+- liquidity-regime IC hit rate >= 0.40;
+- volatility-regime IC hit rate >= 0.40.
+
 ## Step 5: Trading Simulation
 
 Run a simple but explicit simulation before calling a factor tradable.
@@ -180,6 +216,12 @@ Suggested gates:
 - break-even cost must be reported, not inferred;
 - turnover spikes around roll/session boundaries must be audited.
 
+Project default implementation gate:
+
+- turnover proxy <= 0.85 for A-grade standalone factors;
+- factors above this can only be B/C when residualized/model-incremental
+  evidence remains strong.
+
 ## Step 6: Incremental Test
 
 Standalone quality is not enough. Check incremental value.
@@ -202,6 +244,12 @@ Suggested gates:
 - a factor with weak standalone IC can be B if it improves OOS model IC;
 - a factor with high standalone IC can still be rejected if it is redundant.
 
+Project default implementation gate:
+
+- max absolute correlation <= 0.90 against the existing library;
+- max absolute correlation <= 0.90 against selected peers in the same round;
+- high-correlation escape requires abs(residual IC) >= 0.001 or model lift.
+
 ## Step 7: Robustness and Audit
 
 Required checks:
@@ -222,6 +270,12 @@ Suggested gates:
 - multiple-testing adjusted results should still be plausible;
 - leakage suspicion is an automatic E until resolved.
 
+Project default implementation gate:
+
+- scorecard artifact must be saved;
+- Ridge leave-one-factor-out and LightGBM shuffle validation are required before
+  a generated factor is reported as final model-effective evidence.
+
 ## Step 8: Decision
 
 Each factor receives one decision label.
@@ -233,6 +287,15 @@ Each factor receives one decision label.
 | C | Conditional alpha | Works in a documented product/liquidity/volatility/session regime |
 | D | Watchlist | Promising but fails one important stability, cost, or audit gate |
 | E | Discard | Bad quality, leakage risk, unstable sign, or no incremental value |
+
+Project default final artifact rule:
+
+- only `decision_reason == pass_all` candidates are eligible for the generated
+  `new100` expression artifact;
+- model-specific effectiveness is reported separately. Ridge leave-one-factor-
+  out and LightGBM shuffle may retain smaller subsets of the strict scorecard
+  factors; those subsets should be named explicitly instead of calling every
+  scorecard-passed factor model-effective.
 
 ## Factor Scorecard
 

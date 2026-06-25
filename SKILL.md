@@ -27,18 +27,23 @@ backtest.
 5. Enforce low-correlation gates. A candidate should have max absolute
    correlation <= 0.90 against the existing factor library and selected peers,
    unless residualized IC justifies keeping it as a model feature.
-6. Train model-specific feature sets only after the factor passes data quality,
+6. Write the final expression set only from `decision_reason == pass_all`.
+   A/B/C/D/E grades are useful diagnostics, but the default accepted-factor
+   artifact must pass every scorecard gate before model validation.
+7. Train model-specific feature sets only after the factor passes data quality,
    IC, bucket, regime, trading simulation, incremental, and robustness checks.
-7. Predict 2020 OOS and report pooled IC, Pearson IC, rank IC, monthly/daily IC,
+8. Predict 2020 OOS and report pooled IC, Pearson IC, rank IC, monthly/daily IC,
    bucket monotonicity, long-short spread, turnover, cost sensitivity, and
    incremental model lift.
-8. Classify each factor as A/B/C/D/E:
+9. Classify each factor as A/B/C/D/E:
    A core trading alpha, B model feature, C conditional alpha, D watchlist,
    or E discard.
 
 ## Multi-Layer Factor Gate
 
 Use `docs/factor_evaluation_framework.md` as the required evaluation standard.
+Use `references/futures/factor_acceptance_standards.json` as the default
+numerical gate configuration.
 
 ### Step 1: Data Quality
 
@@ -47,6 +52,7 @@ Use `docs/factor_evaluation_framework.md` as the required evaluation standard.
 - outliers and winsorization sensitivity;
 - distribution drift between IS/OOS and across months;
 - potential contract-roll, session-boundary, and cross-contract leakage issues.
+Default gate: coverage >= 0.70, outlier ratio <= 0.02, and non-constant values.
 
 ### Step 2: IC Tests
 
@@ -54,6 +60,8 @@ Use `docs/factor_evaluation_framework.md` as the required evaluation standard.
 - daily/monthly IC mean, volatility, hit rate, t-stat, and drawdown;
 - horizon decay over multiple forward-return horizons;
 - sign stability across products and time.
+Default gate: abs(selection IC) >= 0.001, abs(rank IC) >= 0.0005, monthly
+hit rate >= 0.50, and at least 6 monthly IC observations.
 
 ### Step 3: Bucket Tests
 
@@ -61,6 +69,8 @@ Use `docs/factor_evaluation_framework.md` as the required evaluation standard.
 - top-bottom spread and extreme-bucket contribution;
 - monotonicity score and whether the signal only works in one tail;
 - stability of bucket shape by month and product.
+Default gate: top-bottom spread has the same sign as selection IC and
+abs(monotonicity) >= 0.25.
 
 ### Step 4: Regime Tests
 
@@ -69,6 +79,8 @@ Use `docs/factor_evaluation_framework.md` as the required evaluation standard.
 - volatility regime;
 - intraday session and close/open boundary;
 - roll window versus non-roll window.
+Default gate: product hit rate >= 0.45, liquidity-regime hit rate >= 0.40,
+and volatility-regime hit rate >= 0.40.
 
 ### Step 5: Trading Simulation
 
@@ -77,6 +89,7 @@ Use `docs/factor_evaluation_framework.md` as the required evaluation standard.
 - transaction-cost stress;
 - break-even cost;
 - exposure concentration and capacity proxy.
+Default gate: turnover proxy <= 0.85 for A-grade standalone factors.
 
 ### Step 6: Incremental Tests
 
@@ -85,6 +98,8 @@ Use `docs/factor_evaluation_framework.md` as the required evaluation standard.
 - residualized IC after removing known factor exposures;
 - baseline model versus baseline plus candidate;
 - leave-one-factor-out or permutation/shuffle checks.
+Default gate: max abs corr <= 0.90 versus the existing library and selected
+peers, or abs(residual IC) >= 0.001.
 
 ### Step 7: Robustness and Audit
 
@@ -93,6 +108,8 @@ Use `docs/factor_evaluation_framework.md` as the required evaluation standard.
 - leakage checks;
 - multiple-testing penalty and false discovery control;
 - reproducible artifact paths and exact decision rationale.
+Default gate: keep the scorecard artifact and require model-incremental
+validation before reporting final factor effectiveness.
 
 ### Step 8: Decision
 
@@ -133,7 +150,7 @@ The default accepted-factor path is:
 candidate expressions
   -> IC prefilter
   -> multi-layer scorecard
-  -> low-correlation greedy selection
+  -> strict pass_all low-correlation greedy selection
   -> Ridge leave-one-factor-out / LightGBM shuffle validation
   -> README/report evidence
 ```
