@@ -13,7 +13,9 @@ def resolve_output_path(output_dir, value: str | None):
     if value is None:
         return None
     path = Path(value)
-    return path if path.is_absolute() else output_dir / path
+    if path.is_absolute() or path.exists():
+        return path
+    return output_dir / path
 
 
 def main() -> None:
@@ -30,7 +32,7 @@ def main() -> None:
     args = parser.parse_args()
 
     cfg = load_config(args.config)
-    out_dir = cfg.output_dir / args.sample_dir
+    out_dir = resolve_output_path(cfg.output_dir, args.sample_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     out_file = out_dir / f"{args.month}.parquet"
     if out_file.exists() and not args.force:

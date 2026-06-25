@@ -20,7 +20,9 @@ def resolve_output_path(output_dir: Path, value: str | None) -> Path | None:
     if value is None:
         return None
     path = Path(value)
-    return path if path.is_absolute() else output_dir / path
+    if path.is_absolute() or path.exists():
+        return path
+    return output_dir / path
 
 
 def load_mlp(model_file: Path, device: torch.device):

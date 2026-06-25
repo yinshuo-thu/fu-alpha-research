@@ -30446,5 +30446,7 @@
       "mlp_delta_ic_2020_01": -0.0001068753190997,
       "mlp_retained": false
     }
-  ]
+  ],
+  "mlp_baseline_note": "The MLP overlap333 comparison in this artifact is superseded by references/futures/new1000_mlp_old1144_shuffle_summary.json. Use the old1144 -> retained617 -> retained-new534 audit for MLP conclusions.",
+  "mlp_superseded_by": "references/futures/new1000_mlp_old1144_shuffle_summary.json"
 }

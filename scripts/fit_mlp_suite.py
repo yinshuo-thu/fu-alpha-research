@@ -16,6 +16,13 @@ from fu_alpha_research.feature_matrix import read_feature_list
 from fu_alpha_research.mlp import MLPConfig, make_mlp, recency_weights, scrub_matrix, weighted_loss, weighted_mean_scale
 
 
+def resolve_output_path(output_dir: Path, value: str | Path) -> Path:
+    path = Path(value)
+    if path.is_absolute() or path.exists():
+        return path
+    return output_dir / path
+
+
 def load_manifest(path: Path) -> pd.DataFrame:
     manifest = pd.read_csv(path)
     missing = {"set", "path"} - set(manifest.columns)
@@ -95,12 +102,8 @@ def main() -> None:
     args = parser.parse_args()
 
     cfg = load_config(args.config)
-    manifest_path = Path(args.manifest)
-    if not manifest_path.is_absolute():
-        manifest_path = cfg.output_dir / manifest_path
-    sample_dir = Path(args.sample_dir)
-    if not sample_dir.is_absolute():
-        sample_dir = cfg.output_dir / sample_dir
+    manifest_path = resolve_output_path(cfg.output_dir, args.manifest)
+    sample_dir = resolve_output_path(cfg.output_dir, args.sample_dir)
     manifest = load_manifest(manifest_path)
     set_features = {row.set: read_feature_list(row.path) for row in manifest.itertuples(index=False)}
     union_features = list(dict.fromkeys(x for features in set_features.values() for x in features))
